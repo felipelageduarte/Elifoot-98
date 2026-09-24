@@ -1,0 +1,806 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Elifoot 98 Web — Documentação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0c1710;
+    --bg-panel: #122318;
+    --bg-panel-2: #17301f;
+    --line: #244430;
+    --green: #35c46a;
+    --green-dim: #1f8a4a;
+    --gold: #e0b13a;
+    --red: #e0553a;
+    --text: #eaf3ec;
+    --text-dim: #9fb8a9;
+    --mono: 'IBM Plex Mono', monospace;
+    --display: 'Oswald', sans-serif;
+    --body: 'Inter', sans-serif;
+    --maxw: 980px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:var(--body); line-height:1.6; font-size:16px;
+  }
+  a{color:var(--green)}
+  a:hover{color:var(--gold)}
+  code, .mono{font-family:var(--mono)}
+  h1,h2,h3,h4{font-family:var(--display); text-transform:uppercase; letter-spacing:.02em; color:#fff; margin:0 0 .5em}
+  h1{font-size:2.6rem}
+  h2{font-size:1.7rem; margin-top:0}
+  h3{font-size:1.15rem; color:var(--green)}
+  p{margin:0 0 1em}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative; overflow:hidden;
+    background:
+      radial-gradient(ellipse at 30% -10%, rgba(53,196,106,.25), transparent 60%),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.025) 0 2px, transparent 2px 84px),
+      linear-gradient(180deg, #0f1e14, #0c1710);
+    border-bottom:1px solid var(--line);
+    padding:88px 0 64px;
+  }
+  .hero .eyebrow{
+    font-family:var(--mono); color:var(--gold); letter-spacing:.14em; text-transform:uppercase;
+    font-size:.78rem; margin-bottom:14px; display:flex; align-items:center; gap:10px;
+  }
+  .hero .eyebrow::before{content:"●"; color:var(--green); font-size:.6rem}
+  .hero h1{font-size:clamp(2.2rem, 5vw, 3.4rem); line-height:1.05}
+  .hero h1 span{color:var(--green)}
+  .hero .lede{font-size:1.15rem; color:var(--text-dim); max-width:640px}
+  .hero .scoreboard{
+    margin-top:36px; display:inline-flex; gap:0; border:1px solid var(--line);
+    border-radius:8px; overflow:hidden; font-family:var(--mono); font-size:.85rem;
+  }
+  .hero .scoreboard div{padding:10px 18px; border-right:1px solid var(--line)}
+  .hero .scoreboard div:last-child{border-right:none}
+  .hero .scoreboard b{display:block; color:var(--green); font-size:1.2rem}
+  .hero .scoreboard span{color:var(--text-dim)}
+
+  /* ---------- Layout: sidebar + content ---------- */
+  .layout{display:grid; grid-template-columns:220px 1fr; gap:48px; max-width:1180px; margin:0 auto; padding:48px 24px 100px; align-items:start}
+  nav.toc{position:sticky; top:24px; font-size:.88rem}
+  nav.toc .toc-title{font-family:var(--mono); color:var(--text-dim); text-transform:uppercase; letter-spacing:.1em; font-size:.72rem; margin-bottom:10px}
+  nav.toc ul{list-style:none; margin:0; padding:0; border-left:2px solid var(--line)}
+  nav.toc li{margin:0}
+  nav.toc a{
+    display:block; padding:6px 0 6px 14px; color:var(--text-dim); text-decoration:none;
+    border-left:2px solid transparent; margin-left:-2px;
+  }
+  nav.toc a:hover{color:var(--text); border-left-color:var(--green-dim)}
+
+  main{min-width:0}
+  section{margin-bottom:72px; scroll-margin-top:20px}
+  section > .kicker{font-family:var(--mono); color:var(--green); font-size:.78rem; letter-spacing:.12em; text-transform:uppercase; margin-bottom:6px}
+
+  .lead{font-size:1.08rem; color:var(--text-dim)}
+
+  .panel{
+    background:var(--bg-panel); border:1px solid var(--line); border-radius:10px;
+    padding:20px 22px; margin:20px 0;
+  }
+  .panel.formula{border-left:3px solid var(--green)}
+  .panel.example{border-left:3px solid var(--gold)}
+  .panel h4{margin-bottom:8px; color:#fff; font-size:.95rem; text-transform:none; letter-spacing:0}
+  .panel .label{font-family:var(--mono); font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; color:var(--text-dim); margin-bottom:8px}
+  .panel.formula .label{color:var(--green)}
+  .panel.example .label{color:var(--gold)}
+
+  .kv{display:grid; grid-template-columns:auto 1fr; gap:4px 16px; font-family:var(--mono); font-size:.9rem}
+  .kv dt{color:var(--text-dim)}
+  .kv dd{margin:0; color:var(--text)}
+
+  table{width:100%; border-collapse:collapse; margin:18px 0; font-size:.92rem}
+  th, td{text-align:left; padding:8px 10px; border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono); text-transform:uppercase; font-size:.72rem; letter-spacing:.06em; color:var(--text-dim)}
+  tr:last-child td{border-bottom:none}
+
+  figure{margin:24px 0}
+  figure img{width:100%; border-radius:10px; border:1px solid var(--line); display:block}
+  figcaption{font-size:.82rem; color:var(--text-dim); margin-top:8px; font-family:var(--mono)}
+
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:20px}
+  @media (max-width:720px){.grid2{grid-template-columns:1fr}}
+
+  ul.check{list-style:none; padding:0; margin:0}
+  ul.check li{padding-left:26px; position:relative; margin-bottom:8px}
+  ul.check li::before{content:"▸"; position:absolute; left:0; color:var(--green)}
+
+  .pill{display:inline-block; font-family:var(--mono); font-size:.72rem; padding:2px 9px; border-radius:20px; border:1px solid var(--line); color:var(--text-dim); margin-right:6px}
+
+  footer{border-top:1px solid var(--line); padding:40px 0; text-align:center; color:var(--text-dim); font-size:.88rem}
+  footer .legal{max-width:640px; margin:0 auto 16px; font-size:.82rem}
+
+  @media (max-width:900px){
+    .layout{grid-template-columns:1fr}
+    nav.toc{position:static; border-bottom:1px solid var(--line); padding-bottom:24px; margin-bottom:12px}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Documentação técnica · v0.1</div>
+    <h1>Como o <span>Elifoot 98 Web</span> funciona por dentro</h1>
+    <p class="lede">
+      Um jogo de gerenciamento de futebol que roda inteiro no navegador: geração de elenco,
+      simulação minuto a minuto, mercado de transferências, finanças de clube e uma carreira de
+      treinador que atravessa temporadas. Este documento explica cada mecanismo, com as fórmulas
+      exatas usadas pelo motor e capturas de tela reais do jogo em funcionamento.
+    </p>
+    <div class="scoreboard">
+      <div><b>4 × 20</b><span>divisões · clubes</span></div>
+      <div><b>1–90</b><span>minutos simulados</span></div>
+      <div><b>14</b><span>parâmetros calibráveis</span></div>
+      <div><b>0</b><span>servidores (100% local)</span></div>
+    </div>
+    <p style="margin-top:28px">
+      <a href="play/" style="display:inline-block; background:var(--green); color:#06130b; font-weight:600; padding:12px 26px; border-radius:8px; text-decoration:none; font-family:var(--display); text-transform:uppercase; letter-spacing:.04em;">▶ Jogar agora</a>
+    </p>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="toc">
+    <div class="toc-title">Neste documento</div>
+    <ul>
+      <li><a href="#visao-geral">Visão geral</a></li>
+      <li><a href="#criacao">Criação do clube</a></li>
+      <li><a href="#jogadores">Jogadores</a></li>
+      <li><a href="#escalacao">Escalação e táticas</a></li>
+      <li><a href="#motor-de-partida">Motor de partida</a></li>
+      <li><a href="#mercado">Mercado e leilões</a></li>
+      <li><a href="#financas">Finanças</a></li>
+      <li><a href="#competicoes">Competições</a></li>
+      <li><a href="#temporada">Virada de temporada</a></li>
+      <li><a href="#carreira">Carreira do treinador</a></li>
+      <li><a href="#calibracao">Estatísticas e calibração</a></li>
+      <li><a href="#interface">Interface</a></li>
+      <li><a href="#aviso-legal">Aviso legal</a></li>
+    </ul>
+  </nav>
+
+  <main>
+
+    <section id="visao-geral">
+      <div class="kicker">01 — Panorama</div>
+      <h2>Visão geral do jogo</h2>
+      <p class="lead">
+        O jogador assume o comando de um clube (sorteado ou escolhido entre os times da última
+        divisão) e avança a carreira rodada a rodada. Cada "rodada" do calendário é ou uma jornada
+        do campeonato, ou uma fase da Taça — nunca as duas ao mesmo tempo. O ciclo se repete:
+      </p>
+      <div class="panel">
+        <h4>O loop de uma rodada</h4>
+        <ol>
+          <li><b>Escalar</b> o time (manual, "Automático" ou "Melhores").</li>
+          <li><b>Jogar a rodada</b>: a IA já resolveu os outros jogos da rodada; a partida do
+          jogador é simulada minuto a minuto, com opção de pausar, ajustar velocidade e usar
+          substituições.</li>
+          <li><b>Pós-jogo</b>: os jogadores evoluem (ou regridem) conforme o resultado, a moral do
+          elenco muda, a bilheteria e os salários são lançados no caixa, contratos perto do fim
+          disparam pedidos de renovação, e o mercado de leilões pendentes é resolvido.</li>
+          <li><b>Gerenciar</b> entre rodadas: negociar jogadores, ajustar finanças, responder
+          pedidos de renovação — tudo em tempo "de escritório", sem pressa.</li>
+        </ol>
+      </div>
+      <p>
+        Depois de todas as rodadas da temporada (campeonato + Taça), o jogo processa a
+        <a href="#temporada">virada de temporada</a>: acesso e rebaixamento, premiações, evolução
+        por idade e um novo calendário é sorteado.
+      </p>
+      <figure>
+        <img src="assets/screenshots/escritorio.jpg" alt="Tela inicial do Escritório mostrando posição na tabela, próximo jogo e botão Jogar Rodada">
+        <figcaption>Tela do Escritório — ponto de partida de cada rodada, com o resumo do clube e o próximo confronto.</figcaption>
+      </figure>
+    </section>
+
+    <section id="criacao">
+      <div class="kicker">02 — Fundação</div>
+      <h2>Criação do clube e do elenco</h2>
+      <p class="lead">
+        Ao começar uma carreira, o motor gera as quatro divisões do zero: 20 clubes por divisão,
+        80 no total, cada um com um elenco de 18 jogadores construído estatisticamente a partir do
+        <b>nível</b> da divisão em que nasce.
+      </p>
+      <div class="panel formula">
+        <div class="label">Fórmula — força de um jogador gerado</div>
+        <code>base = 2 + arredondar(nível × 2.2)</code><br>
+        <code>força = clamp(1, 50, base + aleatório(-6, +6))</code><br>
+        <code>se posição = Goleiro: força -= 2</code>
+        <p style="margin-top:12px">
+          O <code>nível</code> depende da divisão do clube (mais alto na Série A, mais baixo na
+          Série D), então times de divisões melhores nascem com elencos mais fortes em média — mas
+          sempre com uma variação de ±6 pontos para não ficarem todos idênticos.
+        </p>
+      </div>
+      <div class="panel example">
+        <div class="label">Exemplo numérico</div>
+        <p>Um clube de nível 15 (Série A) gera jogadores de linha com base = 2 + 33 = 35, então
+        força tipicamente entre 29 e 41. Um clube de nível 4 (Série D) gera base = 2 + 9 = 11,
+        força tipicamente entre 5 e 17 — times fracos de verdade, não apenas "levemente piores".</p>
+      </div>
+      <p>
+        O elenco padrão tem <b>2 goleiros, 6 zagueiros/laterais, 6 meio-campistas e 4
+        atacantes</b> (18 jogadores). Times com "estrelas" pré-definidas (jogadores nomeados com
+        força fixa) preenchem essas posições primeiro; o resto é sorteado. Cerca de 8% dos
+        jogadores de reposição nascem estrangeiros (de uma lista de países sul-americanos), o
+        resto nasce brasileiro.
+      </p>
+      <div class="grid2">
+        <div class="panel">
+          <h4>Comportamento (traço de personalidade)</h4>
+          <p>Cada jogador recebe um dos 6 comportamentos, sorteado por peso — zagueiros têm mais
+          chance de nascer "sarrafeiros" (agressivos) que os demais:</p>
+          <table>
+            <tr><th>Comportamento</th><th>Peso (D)</th><th>Peso (G/M/A)</th></tr>
+            <tr><td>Sarrafeiro</td><td>12</td><td>5</td></tr>
+            <tr><td>Rústico</td><td>18</td><td>8</td></tr>
+            <tr><td>Cadenciado</td><td>22</td><td>12</td></tr>
+            <tr><td>Neutro</td><td>25</td><td>20</td></tr>
+            <tr><td>Cavalheiro</td><td>10</td><td>25</td></tr>
+            <tr><td>Fair play</td><td>13</td><td>30</td></tr>
+          </table>
+          <p>O comportamento afeta a chance de cometer falta/cartão em campo (ver
+          <a href="#motor-de-partida">motor de partida</a>) e também o valor de mercado do
+          jogador.</p>
+        </div>
+        <div class="panel">
+          <h4>Craques (★)</h4>
+          <p>Cerca de <b>30% dos meias e atacantes</b> nascem marcados como "craque". Um craque
+          recebe:</p>
+          <ul class="check">
+            <li>+25% de eficácia na finalização (ajustável em Calibração)</li>
+            <li>+25–30% de eficácia na cobrança de pênalti</li>
+            <li>+25% no valor de mercado</li>
+          </ul>
+          <p>Jogadores "estrela" nomeados no elenco inicial de um clube (com nome próprio) só
+          viram craque se a força inicial for ≥ 42.</p>
+        </div>
+      </div>
+      <p>
+        Cada clube nasce com um <b>caixa inicial</b> escalonado por divisão
+        (<code>$2.500.000</code> na Série A até <code>$120.000</code> na Série D), um preço de
+        ingresso padrão e uma capacidade de estádio própria. Além dos 80 clubes, o motor gera um
+        pool de <b>40 agentes livres</b> (10 por divisão) sem contrato com clube nenhum, disponíveis
+        para contratação a qualquer momento.
+      </p>
+    </section>
+
+    <section id="jogadores">
+      <div class="kicker">03 — Elenco</div>
+      <h2>Jogadores: força, evolução e moral</h2>
+      <h3>Salário pretendido</h3>
+      <div class="panel formula">
+        <div class="label">Fórmula</div>
+        <code>salário = (força × 15 + força²) × fator_comportamento × inflação</code>
+        <p style="margin-top:12px">Comportamentos mais "difíceis" (Sarrafeiro, Rústico) pedem
+        salários mais altos que Cavalheiro/Fair play, na mesma força — o fator de comportamento
+        também é o mesmo multiplicador usado no valor de mercado (ver <a href="#mercado">Mercado</a>).</p>
+      </div>
+      <h3>Evolução pós-jogo</h3>
+      <p>
+        Depois de cada partida, todo jogador que entrou em campo (titular ou substituto) pode subir
+        ou cair 1 ponto de força, <b>ancorado à média de força dos titulares do time</b>:
+      </p>
+      <div class="panel formula">
+        <div class="label">Regra</div>
+        <ul class="check">
+          <li><b>Vitória</b>: jogador sobe 1 ponto (se a força atual não estiver 5+ pontos acima
+          da média do time).</li>
+          <li><b>Empate</b>: 50% de chance de subir 1 ponto, 50% de não mudar.</li>
+          <li><b>Derrota</b>: 50% de chance de cair 1 ponto (se não estiver 5+ pontos abaixo da
+          média), 50% de não mudar.</li>
+          <li><b>Goleiros evoluem mais devagar</b>: mesmo "aprovados" para subir, há 50% de chance
+          extra de não acontecer nada.</li>
+        </ul>
+        <p>Esse teto/piso relativo à média do time (±5) evita que um único craque dispare
+        indefinidamente enquanto o resto do elenco estagna.</p>
+      </div>
+      <h3>Moral do elenco (0–20)</h3>
+      <div class="kv">
+        <dt>Vitória</dt><dd>+1 (e +1 extra se foi fora de casa)</dd>
+        <dt>Empate</dt><dd>zera a sequência de derrotas, sem alterar moral</dd>
+        <dt>Derrota</dt><dd>-1, incrementa a sequência de derrotas</dd>
+        <dt>Caixa negativo</dt><dd>-1 adicional, todo jogo</dd>
+      </div>
+      <p>A moral não afeta diretamente a força dos jogadores em campo, mas alimenta o
+      acompanhamento de clima do elenco e o critério de demissão do técnico (ver
+      <a href="#carreira">Carreira do treinador</a>).</p>
+      <h3>Contratos e pedidos de renovação</h3>
+      <p>
+        Todo jogador tem um contador de <code>contractGames</code> (jogos restantes de contrato),
+        que decresce 1 a cada partida disputada pelo clube. Ao chegar a zero, o motor dispara um
+        <b>pedido de renovação</b>: o jogador exige o salário de mercado atual. O técnico humano
+        pode aceitar (contrato renovado por mais 30 jogos) ou recusar — nesse caso o jogador vai
+        automaticamente para leilão a 60% do valor de mercado. Se o clube não tiver como vender
+        aquele jogador sem ficar abaixo do mínimo de elenco, a renovação é <b>obrigatória</b>.
+      </p>
+    </section>
+
+    <section id="escalacao">
+      <div class="kicker">04 — Tática</div>
+      <h2>Escalação e formações</h2>
+      <p class="lead">
+        O jogo oferece 12 formações táticas clássicas (de 3-3-4 a 6-4-0), mais uma variante
+        extrema 5-0-5 sem meio-campo — arriscada, mas maximiza ataque e defesa ao custo de não ter
+        ninguém no meio.
+      </p>
+      <div class="grid2">
+        <div class="panel">
+          <h4>🤖 Automático</h4>
+          <p>Testa as 12 formações possíveis com o elenco disponível e escolhe a que resulta na
+          maior soma total de força entre os 11 titulares.</p>
+        </div>
+        <div class="panel">
+          <h4>⭐ Melhores</h4>
+          <p>Mantém a formação atual (D-M-A) e simplesmente escala, em cada posição, os jogadores
+          disponíveis com maior força — sem trocar o esquema tático.</p>
+        </div>
+      </div>
+      <p>
+        Jogadores suspensos ou lesionados nunca entram no cálculo de escalação automática. Times
+        controlados por IA (inclusive quando o técnico humano está de férias) sempre escalam no
+        modo Automático antes de cada rodada.
+      </p>
+      <figure>
+        <img src="assets/screenshots/elenco.jpg" alt="Tela de Elenco mostrando o campo tático com a escalação 4-4-2 e a tabela completa de jogadores">
+        <figcaption>Tela de Elenco — diagrama tático da escalação titular e tabela completa do plantel com força, idade, comportamento e ações de mercado.</figcaption>
+      </figure>
+    </section>
+
+    <section id="motor-de-partida">
+      <div class="kicker">05 — O coração do jogo</div>
+      <h2>Motor de partida: simulação minuto a minuto</h2>
+      <p class="lead">
+        Cada partida é simulada minuto a minuto (90 minutos), gerando eventos em tempo real:
+        chances de gol, faltas, cartões, lesões e substituições. Nada é pré-calculado — o resultado
+        emerge da soma de centenas de sorteios independentes.
+      </p>
+
+      <h3>1. Força de ataque e defesa por lado</h3>
+      <div class="panel formula">
+        <div class="label">Fórmulas</div>
+        <code>ataque = Σ(força_atacantes × 2) + Σ(força_meias × 2) / 2 + bônus_nacionalidade + (ajuda_árbitro - 10)</code><br>
+        <code>defesa = Σ(força_zagueiros × 2) + Σ(força_meias × 2) / 2 + força_goleiro × 2 + bônus_nacionalidade + (ajuda_árbitro - 10)</code>
+        <p style="margin-top:12px">
+          Note que <b>a força de cada titular entra dobrada</b> no setor em que atua, e os
+          <b>meio-campistas contribuem em ambos os setores</b>, mas só com metade do peso em cada
+          um — daí porque uma formação 5-0-5 (sem meio-campo) ainda funciona: ela troca a
+          contribuição diluída dos meias por zagueiros e atacantes de força cheia.
+        </p>
+        <p><code>bônus_nacionalidade</code> = +3 pontos por titular cuja nacionalidade seja igual
+        à do clube (incentivo a montar elencos "de casa"). <code>ajuda_árbitro</code> é um valor
+        de 0 a 20 sorteado por árbitro e por lado do jogo (ver seção de árbitros abaixo), com 10
+        sendo neutro.</p>
+      </div>
+      <div class="panel example">
+        <div class="label">Sem meio-campo: por que o 5-0-5 funciona</div>
+        <p>
+          Num 4-4-2 com meias de força 40, cada meia contribui apenas <code>40 × 2 / 2 = 40</code>
+          pontos por setor (ataque e defesa, juntos 80 no total dividido). Num 5-0-5, aqueles
+          "espaços" de meio-campo viram zagueiros e atacantes extras contribuindo com
+          <code>força × 2</code> cheios em um único setor — na prática, mais força bruta
+          concentrada, ao custo de perder o equilíbrio tático que o meio-campo normalmente
+          garante contra times menos extremados.
+        </p>
+      </div>
+
+      <h3>2. Mando de campo: quem cria mais chances</h3>
+      <div class="panel formula">
+        <div class="label">Fórmula — chance de criar uma oportunidade de gol no minuto</div>
+        <code>chance_casa = aleatório(6000) &lt; ataque_casa</code><br>
+        <code>chance_fora = aleatório(7000) &lt; ataque_fora</code><br>
+        <code>(em campo neutro, ambos usam aleatório(6500))</code>
+        <p style="margin-top:12px">
+          O time da casa sorteia contra um divisor menor (6000) que o visitante (7000) — um
+          divisor menor significa mais chance de o sorteio "passar" o teste, ou seja, o mandante
+          tem vantagem estrutural de gerar mais oportunidades por minuto, simulando o fator
+          casa. Esses três divisores (casa/fora/neutro) são ajustáveis no
+          <a href="#calibracao">painel de calibração</a>.
+        </p>
+      </div>
+      <div class="panel">
+        <h4>Gerador anti-goleada</h4>
+        <p>Para evitar placares absurdos quando um time é muito mais fraco, cada minuto também
+        roda um segundo sorteio independente que fica <em>mais generoso</em> quanto menos chances
+        (e gols) aquele time já teve no jogo: <code>aleatório(90) &lt; limite_anti_goleada -
+        (chutes + gols do time)</code>. Um terceiro sorteio residual (1 em 180 para a casa, 1 em
+        270 para o visitante) garante que mesmo o time mais fraco tenha alguma chance pura de
+        sorte a cada minuto.</p>
+      </div>
+
+      <h3>3. Da chance ao chute: o duelo individual</h3>
+      <p>
+        Quando uma chance é gerada, o motor sorteia <b>quem finaliza</b> (ponderado por posição —
+        atacantes têm peso 3, meias peso 2, zagueiros peso 1, multiplicado pela força do jogador, e
+        craques têm peso ×1.5) e <b>quem tenta desarmar</b> do lado defensor (pesos invertidos:
+        zagueiro 3, meia 2, atacante 1). O desarme só acontece se:
+      </p>
+      <div class="panel formula">
+        <div class="label">Fórmula do desarme</div>
+        <code>aleatório(força_defensor) &gt; aleatório(força_atacante)</code>
+        <p style="margin-top:12px">Se o defensor "vence" esse sorteio, a chance morre ali —
+        vira uma jogada desarmada, sem gerar evento visível. Só se o atacante sobrevive ao duelo é
+        que o chute de fato acontece.</p>
+      </div>
+
+      <h3>4. O chute a gol</h3>
+      <div class="panel formula">
+        <div class="label">Fórmula — probabilidade de gol</div>
+        <code>bônus_craque = força_finalizador × (bônus_craque% / 100) — se for craque</code><br>
+        <code>P(gol) = fator_conversão × (força_finalizador + bônus_craque) / (força_finalizador + força_goleiro)</code>
+        <p style="margin-top:12px">Ou seja: quanto mais forte o finalizador em relação ao goleiro
+        adversário, maior a chance de gol — uma razão de forças, não uma soma. O
+        <code>fator_conversão</code> (padrão 0.42) escala a curva inteira e é ajustável na
+        Calibração.</p>
+      </div>
+      <p>Se não é gol, o motor sorteia o desfecho da chance perdida:</p>
+      <table>
+        <tr><th>Resultado</th><th>Probabilidade condicional</th></tr>
+        <tr><td>🧤 Goleiro defende</td><td>40%</td></tr>
+        <tr><td>Chuta para fora</td><td>20%</td></tr>
+        <tr><td>Chuta por cima</td><td>20%</td></tr>
+        <tr><td>😱 Na trave (poste)</td><td>10%</td></tr>
+        <tr><td>😱 No travessão (barra)</td><td>10%</td></tr>
+      </table>
+
+      <h3>5. Faltas, cartões e pênaltis</h3>
+      <div class="panel formula">
+        <div class="label">Cadeia de sorteios por minuto e por time defensor</div>
+        <ol>
+          <li><code>aleatório(100) &lt; % chance de falta</code> (padrão 8%) — se falha, nada
+          acontece nesse minuto.</li>
+          <li>Se há falta, sorteia-se o infrator entre os titulares do time defensor, ponderado
+          pelo <b>peso de cartão do comportamento</b> (times 100% fair play nunca são sorteados
+          como infratores puníveis).</li>
+          <li><code>aleatório(100) &lt; % fração que vira cartão</code> (padrão 9%): decide
+          cartão. Se o infrator já tinha amarelo na partida, é <b>segundo amarelo → vermelho</b>.
+          Senão, sorteia-se entre amarelo e <code>aleatório(100) &lt; % vermelho direto</code>
+          (padrão 4%) para expulsão direta. Três amarelos em partidas diferentes também rendem
+          suspensão automática.</li>
+          <li>Se não virou cartão, ainda pode virar <b>pênalti</b>: <code>% fração que vira
+          pênalti</code> (padrão 2%) sobre as faltas restantes. O técnico humano escolhe quem
+          cobra; a IA sempre escolhe o jogador de maior força efetiva de meio ou ataque.</li>
+        </ol>
+      </div>
+      <div class="panel formula">
+        <div class="label">Fórmula — conversão de pênalti</div>
+        <code>eficácia = força_cobrador × (1.3 se craque) × (1.0 se meia/atacante, senão 0.7)</code><br>
+        <code>P(gol) = clamp(0.4, 0.95, fator_pênalti × eficácia / (eficácia + força_goleiro × 0.4))</code>
+      </div>
+
+      <h3>6. Lesões e substituições</h3>
+      <p>
+        A cada minuto e por time, há uma chance de lesão configurável (padrão 3 em 1000) sobre um
+        titular sorteado ao acaso. A lesão tira o jogador de campo imediatamente, marca quantos
+        jogos ele ficará fora (1 a 6) e pode reduzir sua força em até 3 pontos permanentemente.
+        Times de IA substituem automaticamente pelo melhor jogador disponível na mesma posição no
+        banco; o técnico humano escolhe manualmente quem entra. Um jogador que <b>saiu</b> por
+        substituição normal não pode voltar a campo na mesma partida — a mesma regra do futebol
+        real.
+      </p>
+
+      <h3>7. Árbitros</h3>
+      <p>
+        Cada partida sorteia um árbitro de um quadro fixo, cada um com um nível de "ajuda" a favor
+        de cada lado (0 a 20, entrando na fórmula de força de ataque/defesa como mostrado acima).
+        Isso simula, de forma simplificada, arbitragens mais ou menos rigorosas ou mais ou menos
+        favoráveis a um dos lados.
+      </p>
+
+      <h3>8. Disputa por pênaltis</h3>
+      <p>Quando a Taça empata após os 90 minutos, o motor roda uma disputa por pênaltis: 5
+      cobranças alternadas (ou até a matemática decidir antes, se a diferença já for
+      irreversível), seguidas de morte súbita se ainda houver empate.</p>
+      <div class="panel formula">
+        <div class="label">Fórmula — conversão na disputa</div>
+        <code>eficácia = força_cobrador × (1.3 se craque)</code><br>
+        <code>P(gol) = clamp(0.4, 0.92, fator_shootout × eficácia / (eficácia + força_goleiro × 0.5))</code>
+      </div>
+
+      <h3>9. Público e renda do jogo</h3>
+      <div class="panel formula">
+        <div class="label">Fórmula — público pagante</div>
+        <code>força_média = (força_média_titulares_casa + força_média_titulares_visitante) / 2</code><br>
+        <code>demanda_base = (2000 + 900 × força_média) × fator_divisão</code><br>
+        <code>fator_preço = clamp(0.25, 1.3, preço_justo / preço_do_ingresso)</code><br>
+        <code>público = clamp(500, capacidade_do_estádio, demanda_base × fator_preço × fator_torcida × aleatório(85%–115%))</code>
+        <p style="margin-top:12px">
+          O fator de divisão penaliza divisões inferiores (1.0 na Série A, caindo até 0.3 na D).
+          O "preço justo" cresce com a força média do confronto e com a inflação acumulada —
+          cobrar acima do preço justo reduz a demanda; cobrar abaixo, aumenta (até o limite da
+          capacidade do estádio).
+        </p>
+      </div>
+      <figure>
+        <img src="assets/screenshots/partida-ao-vivo.jpg" alt="Tela de partida ao vivo mostrando o placar Flamengo 1x0 Mirassol no minuto 7, com o feed de eventos da simulação">
+        <figcaption>Partida em andamento — feed de eventos minuto a minuto, com controle de velocidade e substituições.</figcaption>
+      </figure>
+    </section>
+
+    <section id="mercado">
+      <div class="kicker">06 — Economia do elenco</div>
+      <h2>Mercado de transferências e leilões</h2>
+      <h3>Valor de mercado</h3>
+      <div class="panel formula">
+        <div class="label">Fórmula</div>
+        <code>base = força² × 4000 × fator_comportamento</code><br>
+        <code>se comprador estrangeiro em relação ao jogador: base ×= 0.75</code><br>
+        <code>se craque: base ×= 1.25</code><br>
+        <code>fator_idade = 1.3 (≤21 anos) · 1.0 (22–29) · 0.75 (30–32) · 0.5 (≥33)</code><br>
+        <code>valor = máximo(1000, arredondar(base × fator_idade × inflação))</code>
+        <p style="margin-top:12px">
+          O valor cresce com o <b>quadrado</b> da força — um jogador de força 40 vale 4× mais que
+          um de força 20 (na mesma idade e comportamento), não o dobro. Jogadores jovens (≤21)
+          custam um prêmio de 30% sobre o valor "puro"; veteranos (33+) valem metade.
+        </p>
+      </div>
+      <h3>Oferta direta</h3>
+      <p>O jogador humano pode oferecer um valor direto por qualquer jogador de outro clube. O
+      vendedor aceita se a oferta superar um piso, que depende de o jogador estar listado à venda
+      ou não:</p>
+      <div class="kv">
+        <dt>Listado à venda</dt><dd>aceita a partir de 80% do valor de mercado</dd>
+        <dt>Titular do time vendedor</dt><dd>exige pelo menos 150% do valor de mercado</dd>
+        <dt>Reserva não listado</dt><dd>exige pelo menos 110% do valor de mercado</dd>
+      </div>
+      <h3>Leilões</h3>
+      <p>
+        Colocar um jogador em leilão define um lance mínimo; o leilão fica aberto por uma rodada
+        e <b>resolve no início da rodada seguinte</b>, somando lances humanos e lances
+        automáticos de clubes de IA. Um clube de IA oferece lance quando precisa reforçar aquela
+        posição (elenco com menos de 20 jogadores, ou menos de 2 na mesma posição) <em>e</em> o
+        jogador tem força pelo menos igual à média do próprio elenco menos 3 pontos — o lance
+        sorteado varia entre o valor de mercado e até 41% acima dele, limitado a 60% do caixa
+        disponível do clube.
+      </p>
+      <p>Quando um jogador é comprado ou tem o contrato renovado, ele fica <b>bloqueado para
+      revenda até a próxima temporada</b> — evita comprar e revender o mesmo jogador em sequência
+      na mesma janela.</p>
+      <h3>Limites de elenco</h3>
+      <div class="kv">
+        <dt>Máximo de jogadores</dt><dd>24 por clube</dd>
+        <dt>Mínimo de jogadores</dt><dd>11 (1 goleiro + 10 de linha)</dd>
+        <dt>Estrangeiros</dt><dd>no máximo 5 por clube</dd>
+      </div>
+      <p>
+        Um jogador só conta como "estrangeiro" se sua nacionalidade for diferente da do clube
+        <em>e</em> nenhum acordo de livre circulação cobrir os dois países ao mesmo tempo — o
+        motor reconhece dois desses acordos (um bloco de livre circulação entre países europeus e
+        uma comunidade de países de língua portuguesa), inspirados em regras reais de circulação
+        de atletas entre nações com laços históricos ou econômicos.
+      </p>
+      <h3>Venda automática por dívida</h3>
+      <p>
+        Se o caixa do clube ficar negativo, o motor coloca automaticamente em leilão (sem lance
+        mínimo) o jogador de maior valor entre os que têm contrato perto do fim e podem ser
+        vendidos sem violar o mínimo de elenco — um por rodada, até o caixa se recuperar.
+      </p>
+      <figure>
+        <img src="assets/screenshots/transferencias-observar.jpg" alt="Aba Observar clubes em Transferências, mostrando o elenco completo do Palmeiras com opções de oferta">
+        <figcaption>Observando um clube rival no mercado — elenco completo, valores de mercado e botão de oferta direta por jogador.</figcaption>
+      </figure>
+    </section>
+
+    <section id="financas">
+      <div class="kicker">07 — Gestão do clube</div>
+      <h2>Finanças</h2>
+      <p class="lead">
+        Cada partida gera um lançamento contábil completo: bilheteria (se o clube for mandante),
+        folha salarial, juros de empréstimo e qualquer transferência do dia. Tudo isso alimenta a
+        Demonstração de Resultado (DRE) da temporada.
+      </p>
+      <h3>Empréstimo bancário</h3>
+      <div class="panel formula">
+        <div class="label">Regras</div>
+        <ul class="check">
+          <li>Empréstimos são tomados em parcelas fixas de <code>$100.000</code>.</li>
+          <li>Juros de <b>5% do capital em dívida, cobrados a cada partida</b> (não por ano) —
+          um empréstimo alto e esquecido corrói o caixa rapidamente.</li>
+          <li>O limite de crédito depende da "confiança do banco": escala com a última bilheteria
+          registrada (ou com o tamanho da torcida, na ausência de histórico) e cai pela metade se
+          o clube já estiver no vermelho.</li>
+        </ul>
+      </div>
+      <h3>Ampliação de estádio</h3>
+      <p>Cada obra adiciona 5.000 lugares à capacidade, por um custo de <code>$500.000</code>
+      corrigido pela inflação acumulada — as novas bancadas já valem a partir do próximo jogo em
+      casa.</p>
+      <h3>Inflação</h3>
+      <p>A cada virada de temporada, a inflação acumulada sobe <b>5%</b>, reajustando salários
+      pretendidos, valores de mercado, preços de obra e premiações — o dinheiro de temporadas
+      futuras vale um pouco menos em termos reais, empurrando o jogador a negociar e investir em
+      vez de guardar caixa parado indefinidamente.</p>
+      <figure>
+        <img src="assets/screenshots/financas-dre.jpg" alt="Tela de Finanças mostrando a Demonstração de Resultado da temporada com receitas de bilheteria e despesas de salários">
+        <figcaption>Demonstração de Resultado (DRE) da temporada — receitas e despesas operacionais, com o resultado líquido acumulado.</figcaption>
+      </figure>
+    </section>
+
+    <section id="competicoes">
+      <div class="kicker">08 — Calendário</div>
+      <h2>Competições: Campeonato e Taça</h2>
+      <h3>Campeonato</h3>
+      <p>
+        Pontos corridos dentro de cada uma das 4 divisões (20 clubes cada, turno e returno). Ao
+        fim da temporada, os <b>4 primeiros</b> de cada divisão (exceto a Série A) sobem, e os
+        <b>4 últimos</b> de cada divisão (exceto a Série D) descem — trocando de lugar entre as
+        divisões vizinhas.
+      </p>
+      <figure>
+        <img src="assets/screenshots/classificacao.jpg" alt="Tabela de classificação da Série A com pontos, jogos, vitórias, empates, derrotas e saldo de gols">
+        <figcaption>Classificação da Série A — critérios de desempate: pontos, saldo de gols, gols pró.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/screenshots/jogos-rodada.jpg" alt="Lista de jogos da 1ª rodada da Série A com placares e público de cada partida">
+        <figcaption>Resultados de uma rodada completa da Série A, incluindo o público pagante de cada jogo.</figcaption>
+      </figure>
+      <h3>Taça</h3>
+      <p>
+        Torneio eliminatório de jogo único envolvendo <b>todas as equipes das quatro divisões ao
+        mesmo tempo</b> — times de divisões diferentes podem se enfrentar já nas primeiras fases.
+        Quando o número de participantes não é uma potência de 2, uma <b>pré-eliminatória</b>
+        reduz o chaveamento ao tamanho certo antes das fases nomeadas (oitavas, quartas,
+        semifinais, final). Empates em 90 minutos vão direto para disputa por pênaltis — não há
+        prorrogação. A <b>final é sempre em campo neutro</b>, com a renda da bilheteria dividida
+        igualmente entre os dois finalistas.
+      </p>
+      <figure>
+        <img src="assets/screenshots/taca.jpg" alt="Chaveamento da pré-eliminatória da Taça com dezenas de confrontos entre clubes de diferentes divisões">
+        <figcaption>Pré-eliminatória da Taça — clubes de todas as divisões misturados no mesmo chaveamento.</figcaption>
+      </figure>
+      <h3>Premiações</h3>
+      <div class="kv">
+        <dt>Campeão de cada divisão</dt><dd>prêmio maior na Série A, reduzido pela metade a cada divisão abaixo</dd>
+        <dt>Vencedor da Taça</dt><dd>prêmio fixo em dinheiro para o clube campeão</dd>
+        <dt>Artilheiro do campeonato</dt><dd>prêmio ao(s) clube(s) do(s) jogador(es) empatado(s) na artilharia — todos recebem em caso de empate</dd>
+      </div>
+    </section>
+
+    <section id="temporada">
+      <div class="kicker">09 — Ciclo anual</div>
+      <h2>Virada de temporada</h2>
+      <p class="lead">
+        Ao final de todas as rodadas, o motor processa de uma vez: apuração de campeões,
+        acesso/rebaixamento, premiações, envelhecimento do elenco e um calendário totalmente novo
+        para a próxima temporada.
+      </p>
+      <div class="panel formula">
+        <div class="label">Envelhecimento e evolução por idade (aplicado a cada jogador, uma vez por temporada)</div>
+        <ul class="check">
+          <li>Idade +1.</li>
+          <li>Estatísticas da temporada zeram (gols, cartões, suspensões, lesões).</li>
+          <li><b>35 anos ou mais</b>: 50% de chance de aposentadoria (sai do elenco definitivamente).</li>
+          <li><b>31 a 34 anos</b>: 40% de chance de perder 1 a 3 pontos de força.</li>
+          <li><b>23 anos ou menos</b>: 50% de chance de ganhar 1 a 2 pontos de força.</li>
+          <li>Salário reajustado em +5% (acompanhando a inflação anual).</li>
+        </ul>
+      </div>
+      <p>
+        Clubes que ficam com menos de 14 jogadores após as aposentadorias promovem jovens da base
+        automaticamente para preencher o elenco. Cerca de metade dos agentes livres não
+        contratados na temporada são removidos do mercado (para dar espaço a uma nova geração), e
+        um novo chaveamento de Taça e tabela de campeonato são sorteados do zero.
+      </p>
+    </section>
+
+    <section id="carreira">
+      <div class="kicker">10 — O treinador</div>
+      <h2>Carreira do treinador</h2>
+      <h3>Pontuação no ranking de treinadores</h3>
+      <div class="kv">
+        <dt>Vitória fora de casa</dt><dd>+3 pontos</dd>
+        <dt>Vitória em casa</dt><dd>+2 pontos</dd>
+        <dt>Empate fora de casa</dt><dd>+2 pontos</dd>
+        <dt>Empate em casa</dt><dd>+1 ponto</dd>
+      </div>
+      <p>O ranking geral de treinadores ordena primeiro por número de campeonatos vencidos,
+      depois taças, depois pontos acumulados.</p>
+      <figure>
+        <img src="assets/screenshots/ranking-treinadores.jpg" alt="Ranking de treinadores ordenado por campeonatos, taças e pontos">
+        <figcaption>Ranking geral de treinadores — todos os técnicos da liga, humanos e IA, no mesmo critério.</figcaption>
+      </figure>
+      <h3>Demissão</h3>
+      <p>Um técnico é demitido automaticamente se:</p>
+      <ul class="check">
+        <li>o clube sofrer <b>5 derrotas consecutivas</b>, ou</li>
+        <li>o caixa ficar abaixo de <b>−3× a folha salarial</b> por <b>3 rodadas seguidas</b>.</li>
+      </ul>
+      <p>Quando um técnico humano é demitido, a IA assume o clube e o jogador pode receber um
+      convite de outro clube que também tenha ficado sem técnico — priorizando o candidato
+      desempregado com melhor currículo (campeonatos, taças, pontos de ranking) ou, na falta de
+      um, oferecendo a um técnico já empregado em divisão inferior.</p>
+      <h3>Modo férias</h3>
+      <p>O jogador pode colocar o próprio clube "de férias": a partir daí, a IA assume as decisões
+      de escalação, pedidos de renovação e política de leilão daquele clube, sem removê-lo do
+      controle do jogador — útil para pausar sem perder o cargo.</p>
+    </section>
+
+    <section id="calibracao">
+      <div class="kicker">11 — Ajuste fino</div>
+      <h2>Estatísticas e calibração do motor</h2>
+      <p class="lead">
+        Todo o "sentimento" do motor de partida — frequência de gols, cartões, pênaltis e lesões —
+        vem de 14 constantes numéricas centralizadas, e o jogo expõe um painel para o jogador
+        ajustar cada uma delas ao próprio gosto, sem precisar editar código.
+      </p>
+      <table>
+        <tr><th>Parâmetro</th><th>Padrão</th><th>Efeito</th></tr>
+        <tr><td>Vantagem de mando</td><td>6000</td><td>Menor = mais chances de ataque em casa</td></tr>
+        <tr><td>Chances do visitante</td><td>7000</td><td>Menor = mais chances de ataque fora</td></tr>
+        <tr><td>Chances em campo neutro</td><td>6500</td><td>Usado na final da Taça</td></tr>
+        <tr><td>Anti-goleada</td><td>10</td><td>Maior = jogos mais equilibrados</td></tr>
+        <tr><td>Conversão de gol</td><td>0.42</td><td>Maior = mais gols por jogo</td></tr>
+        <tr><td>Bônus do craque</td><td>25%</td><td>Vantagem extra na finalização e pênalti</td></tr>
+        <tr><td>Chance de falta</td><td>8%</td><td>Por minuto, por time</td></tr>
+        <tr><td>Faltas que viram cartão</td><td>9%</td><td>Menor = menos cartões</td></tr>
+        <tr><td>Vermelho direto</td><td>4%</td><td>Fração dos cartões que são expulsão direta</td></tr>
+        <tr><td>Faltas que viram pênalti</td><td>2%</td><td>Menor = menos pênaltis</td></tr>
+        <tr><td>Chance de lesão</td><td>3‰</td><td>Por minuto, por time</td></tr>
+        <tr><td>Substituições máximas</td><td>3</td><td>Por time, por partida</td></tr>
+        <tr><td>Conversão de pênalti</td><td>0.90</td><td>Em jogo</td></tr>
+        <tr><td>Conversão na disputa</td><td>0.78</td><td>Desempate da Taça</td></tr>
+      </table>
+      <figure>
+        <img src="assets/screenshots/calibracao.jpg" alt="Painel de calibração do motor de partida com sliders para cada parâmetro">
+        <figcaption>Painel de Calibração — cada slider ajusta uma das constantes do motor em tempo real, valendo a partir da próxima partida simulada.</figcaption>
+      </figure>
+      <p>
+        Para validar o efeito dessas mudanças na prática, o jogo mantém um <b>painel de
+        estatísticas agregadas</b> de toda a carreira: gols por jogo, % de vitórias em
+        casa/fora/empate, cartões e pênaltis por jogo, taxa de conversão de pênalti e lesões por
+        jogo — permitindo comparar o comportamento real do motor contra os números configurados.
+      </p>
+      <figure>
+        <img src="assets/screenshots/estatisticas.jpg" alt="Painel de estatísticas agregadas mostrando gols por jogo, percentuais de resultado, cartões e pênaltis desde a temporada 2026">
+        <figcaption>Estatísticas agregadas da carreira — o termômetro para saber se a calibração está tendo o efeito desejado.</figcaption>
+      </figure>
+    </section>
+
+    <section id="interface">
+      <div class="kicker">12 — Experiência</div>
+      <h2>Interface</h2>
+      <ul class="check">
+        <li><b>3 temas visuais</b>: um retrô (inspirado nos gerenciadores de futebol clássicos dos
+        anos 90), um moderno claro e um "Ultra" escuro e animado para partidas.</li>
+        <li><b>6 velocidades de simulação</b>, de Lento a Ultrassônico, além de pular direto para o
+        fim do jogo.</li>
+        <li><b>Atalhos de teclado completos</b> para navegar entre telas, jogar a rodada, pausar,
+        trocar velocidade e abrir substituições sem tirar as mãos do teclado.</li>
+        <li><b>Salvamento automático</b> no armazenamento local do navegador — a carreira continua
+        de onde parou, sem conta ou servidor.</li>
+        <li><b>Confirmações antes de ações irreversíveis</b> (rescisões, leilões, empréstimos) para
+        evitar cliques acidentais que custem caro.</li>
+      </ul>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p class="legal" id="aviso-legal">
+      <b>Aviso legal:</b> este é um projeto de fã, independente, feito para fins de estudo e
+      entretenimento. Todo o código, dados de times/jogadores e regras descritas aqui são criação
+      própria deste projeto — nada foi extraído, copiado ou derivado de qualquer jogo comercial. O
+      nome "Elifoot 98" é citado apenas como referência de gênero e estilo de jogo; este projeto
+      não é afiliado, endossado ou associado aos detentores de direitos do jogo original.
+    </p>
+    <p>Elifoot 98 Web — feito com Vite, React e TypeScript. Sem backend, sem coleta de dados.</p>
+  </div>
+</footer>
+
+</body>
+</html>

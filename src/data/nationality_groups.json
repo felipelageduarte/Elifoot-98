@@ -1,0 +1,33 @@
+{
+ "FREE_MOVEMENT_EU": [
+  "POR",
+  "ESP",
+  "FRA",
+  "ITA",
+  "ALE",
+  "AUT",
+  "GRE",
+  "ING",
+  "ESC",
+  "WAL",
+  "ILN",
+  "IRL",
+  "DIN",
+  "BEL",
+  "HOL",
+  "LUX",
+  "FIN",
+  "SUE"
+ ],
+ "LUSOFONIA": [
+  "POR",
+  "BRA",
+  "ANG",
+  "MOC",
+  "CAV",
+  "STP",
+  "GBI",
+  "GNE",
+  "TIM"
+ ]
+}

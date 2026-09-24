@@ -1,0 +1,15 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+*.local
+*.tsbuildinfo
+
+# Material de referência/dados extraídos que não deve ir para o repositório
+# público (uso local apenas). O modo Clássico 1998 carrega esse dataset em
+# tempo de execução via fetch() e simplesmente some do menu sem ele.
+/engenharia_reversa/
+/files.zip
+/public/data/classic1998.json
+# build de docs/play copia public/ — nunca comitar o dataset ali também
+/docs/play/data/classic1998.json
