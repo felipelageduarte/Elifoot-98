@@ -72,6 +72,7 @@ button, .btn {
   font-size: 13px;
   cursor: pointer;
   color: var(--text);
+  touch-action: manipulation;
 }
 
 button:active {
@@ -129,6 +130,7 @@ select, input {
   border-color: var(--win-darker) var(--win-light) var(--win-light) var(--win-darker);
   padding: 8px;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .panel.inset-gray {
@@ -186,6 +188,12 @@ table.grid tr.hoverable:hover td {
   padding: 3px;
   border-top: 2px solid var(--win-light);
   font-size: 12px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.statusbar .cell {
+  flex-shrink: 0;
 }
 
 .statusbar .cell {
@@ -1542,4 +1550,96 @@ body.theme-modern .team-link:hover {
   padding: 4px 6px;
   font-size: 11.5px;
   white-space: nowrap;
+}
+
+/* ==================================================================
+   Mobile: telas estreitas (celular). Reduz densidade retrô,
+   aumenta alvos de toque e evita títulos/gráficos gigantes.
+   ================================================================== */
+
+@media (max-width: 600px) {
+  .desktop {
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .logo-title {
+    font-size: 26px;
+    margin: 12px 0 4px 0;
+    letter-spacing: 0.5px;
+  }
+
+  body.theme-ultra .logo-title {
+    font-size: 30px;
+  }
+
+  .logo-sub {
+    font-size: 12.5px;
+    margin-bottom: 10px;
+  }
+
+  .window-title {
+    font-size: 13px;
+    padding: 4px 6px;
+  }
+
+  body.theme-ultra .window-title {
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+
+  .window-body {
+    padding: 8px;
+  }
+
+  body.theme-ultra .window-body,
+  body.theme-modern .window-body {
+    padding: 12px;
+  }
+
+  .menubar {
+    gap: 2px;
+    padding: 3px;
+  }
+
+  .menubar button {
+    padding: 6px 8px;
+    font-size: 12.5px;
+  }
+
+  button, .btn, select, input {
+    min-height: 36px;
+  }
+
+  .squad-actions button {
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+
+  table.grid th,
+  table.grid td {
+    padding: 6px 8px;
+    white-space: nowrap;
+  }
+
+  .menu-dropdown-panel {
+    min-width: 160px;
+    max-width: calc(100vw - 24px);
+  }
+
+  .scoreboard {
+    font-size: 17px;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  body.theme-ultra .scoreboard {
+    font-size: 20px;
+  }
+
+  .field-player {
+    min-width: 58px;
+    font-size: 10px;
+    padding: 2px 4px;
+  }
 }
