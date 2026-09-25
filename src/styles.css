@@ -182,6 +182,8 @@ table.grid tr.hoverable:hover td {
 
 .grow { flex: 1; }
 
+.sub-cols { flex-wrap: nowrap; }
+
 .statusbar {
   display: flex;
   gap: 4px;
@@ -1622,6 +1624,13 @@ body.theme-modern .team-link:hover {
     white-space: nowrap;
   }
 
+  /* tabelas de texto livre (ex.: atalhos de teclado) quebram linha normalmente
+     em vez de forçar scroll horizontal para caber uma frase inteira */
+  table.grid.wrap th,
+  table.grid.wrap td {
+    white-space: normal;
+  }
+
   .menu-dropdown-panel {
     min-width: 160px;
     max-width: calc(100vw - 24px);
@@ -1641,5 +1650,78 @@ body.theme-modern .team-link:hover {
     min-width: 58px;
     font-size: 10px;
     padding: 2px 4px;
+  }
+
+  /* Grupos de painéis lado a lado (Escritório, Finanças, Configurações) viravam
+     colunas espremidas e cortadas — no mobile empilham em coluna única. */
+  .panel-group {
+    flex-direction: column;
+  }
+
+  .panel-group > .panel {
+    width: 100%;
+  }
+
+  /* Painel de substituições (jogo ao vivo): "Em campo / botão / Banco" tinha
+     flex-wrap: nowrap fixo e não cabia — empilha em coluna, botão centralizado. */
+  .sub-cols {
+    flex-direction: column;
+    flex-wrap: wrap;
+  }
+
+  .sub-cols > .grow {
+    width: 100%;
+  }
+
+  .sub-cols > .sub-cols-action {
+    width: 100%;
+    min-width: 0 !important;
+    padding: 10px 0;
+  }
+
+  /* Barra de status: em vez de tira rolável com célula cortada na borda,
+     quebra em grade de 2 colunas — tudo visível sem rolar. */
+  .statusbar {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+
+  .statusbar .cell {
+    flex: 1 1 calc(50% - 4px);
+    text-align: center;
+  }
+
+  .statusbar .cell.grow {
+    flex-basis: 100%;
+    text-align: center;
+  }
+
+  /* Barra de menu principal: alvos de toque full-width, um por linha,
+     em vez de botões pequenos quebrando em várias linhas desalinhadas. */
+  .menubar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .menubar button,
+  .menu-dropdown {
+    width: 100%;
+  }
+
+  .menu-dropdown button {
+    width: 100%;
+    text-align: left;
+  }
+
+  .menubar .menu-dropdown-panel {
+    position: static;
+    width: 100%;
+    margin-top: 2px;
+    box-shadow: none;
+  }
+
+  .menubar select {
+    width: 100%;
+    margin-top: 2px;
   }
 }

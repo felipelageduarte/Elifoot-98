@@ -11,7 +11,7 @@ export function SettingsPage() {
 
   return (
     <div className="col">
-      <div className="row" style={{ alignItems: 'stretch' }}>
+      <div className="row panel-group" style={{ alignItems: 'stretch' }}>
         <div className="panel grow">
           <h3>🎨 Visual</h3>
           <div className="row">
@@ -81,7 +81,7 @@ export function SettingsPage() {
         </div>
       </div>
 
-      <div className="row" style={{ alignItems: 'stretch' }}>
+      <div className="row panel-group" style={{ alignItems: 'stretch' }}>
         <div className="panel grow">
           <h3>🛡️ Segurança</h3>
           <label>
@@ -104,7 +104,7 @@ export function SettingsPage() {
             />{' '}
             Mostrar dicas de atalhos na barra de status
           </label>
-          <table className="grid" style={{ marginTop: 8 }}>
+          <table className="grid wrap" style={{ marginTop: 8 }}>
             <tbody>
               <tr><td><b>1–9</b></td><td>Navegar entre as telas</td></tr>
               <tr><td><b>J</b></td><td>Jogar rodada</td></tr>

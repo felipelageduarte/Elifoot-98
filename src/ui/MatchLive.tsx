@@ -375,7 +375,7 @@ export function MatchLive({
               Restam <b>{subsLeft(sim, subTeamId)}</b> substituições · goleiro só sai por goleiro
             </span>
           </div>
-          <div className="row" style={{ alignItems: 'stretch', flexWrap: 'nowrap' }}>
+          <div className="row sub-cols" style={{ alignItems: 'stretch' }}>
             <div className="grow">
               <b>Em campo ({fieldPlayers(sim, subTeamId).length})</b>
               <div className="sub-list">
@@ -394,7 +394,7 @@ export function MatchLive({
                   ))}
               </div>
             </div>
-            <div style={{ alignSelf: 'center', textAlign: 'center', minWidth: 130 }}>
+            <div className="sub-cols-action" style={{ alignSelf: 'center', textAlign: 'center', minWidth: 130 }}>
               <button
                 className="primary"
                 style={{ fontSize: 15, padding: '12px 18px' }}

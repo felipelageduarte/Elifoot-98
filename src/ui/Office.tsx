@@ -53,7 +53,7 @@ export function Office({
 
   return (
     <div className="col">
-      <div className="row" style={{ alignItems: 'stretch' }}>
+      <div className="row panel-group" style={{ alignItems: 'stretch' }}>
         <div className="panel grow">
           <h3>
             <TeamChip colors={team.colors} /> {team.name} —{' '}

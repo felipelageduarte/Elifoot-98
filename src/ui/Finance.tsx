@@ -43,7 +43,7 @@ export function Finance({
       )}
 
       {tab === 'resumo' && (
-        <div className="row" style={{ alignItems: 'stretch' }}>
+        <div className="row panel-group" style={{ alignItems: 'stretch' }}>
           <div className="panel grow">
             <h3>💰 Situação</h3>
             <p>Caixa: <Money value={team.cash} /></p>
