@@ -42,7 +42,7 @@ export function MatchLive({
   const [subMsg, setSubMsg] = useState('')
   const [halfPause, setHalfPause] = useState(false)
   const [penaltyTeamId, setPenaltyTeamId] = useState<number | null>(null)
-  const [injurySub, setInjurySub] = useState<{ teamId: number; injuredName: string } | null>(null)
+  const [injurySub, setInjurySub] = useState<{ teamId: number; injuredName: string; injuredPos: string } | null>(null)
   const tickerRef = useRef<HTMLDivElement>(null)
   const startedRef = useRef(false)
 
@@ -84,6 +84,7 @@ export function MatchLive({
         setInjurySub({
           teamId: sim.pendingHumanInjury.teamId,
           injuredName: injured ? injured.name : 'O jogador',
+          injuredPos: injured ? injured.pos : '',
         })
       }
       if (sim.finished) setRunning(false)
@@ -294,12 +295,14 @@ export function MatchLive({
         <div className="panel inset-gray">
           <h3>🚑 Lesão — {state.teams[injurySub.teamId].name}</h3>
           <p style={{ margin: '4px 0' }}>
-            <b>{injurySub.injuredName}</b> lesionou-se e tem de ser substituído. Escolha o jogador a entrar:
+            <b>{injurySub.injuredName}</b> ({injurySub.injuredPos}) lesionou-se e tem de ser substituído.
+            Escolha o jogador a entrar (destacado: mesma posição):
           </p>
           <div className="row">
             {benchPlayers(sim, injurySub.teamId).map((p) => (
               <button
                 key={p.id}
+                className={p.pos === injurySub.injuredPos ? 'primary' : ''}
                 onClick={() => {
                   const err = forcedSubstitute(sim, injurySub.teamId, p.id)
                   if (err) {
