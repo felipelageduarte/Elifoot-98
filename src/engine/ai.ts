@@ -67,9 +67,8 @@ export function aiPostRound(state: GameState) {
     }
 
     // "ciclo de vendas irrisórias": todo clube tem uma chance por rodada de
-    // pôr um reserva em leilão sem lance mínimo (reproduz o mercado ativo
-    // do original — com 80 clubes isso gera negociações IA-vs-IA visíveis
-    // nas Notícias praticamente toda rodada, e não só a cada 4 jornadas)
+    // pôr um reserva em leilão sem lance mínimo — com 80 clubes isso gera
+    // negociações IA-vs-IA visíveis nas Notícias quase toda rodada
     if (rand() < 0.08 && team.players.length > 14) {
       const candidates = team.players.filter(
         (p) => !p.auction && !team.lineup.includes(p.id) && p.blockedUntilSeason <= state.seasonNumber,

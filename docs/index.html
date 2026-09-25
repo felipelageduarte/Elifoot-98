@@ -145,8 +145,9 @@
       <div><b>14</b><span>parâmetros calibráveis</span></div>
       <div><b>0</b><span>servidores (100% local)</span></div>
     </div>
-    <p style="margin-top:28px">
+    <p style="margin-top:28px; display:flex; gap:14px; flex-wrap:wrap;">
       <a href="play/" style="display:inline-block; background:var(--green); color:#06130b; font-weight:600; padding:12px 26px; border-radius:8px; text-decoration:none; font-family:var(--display); text-transform:uppercase; letter-spacing:.04em;">▶ Jogar agora</a>
+      <a href="https://github.com/felipelageduarte/Elifoot-98" style="display:inline-block; background:transparent; color:var(--text); border:1px solid var(--line); font-weight:600; padding:12px 26px; border-radius:8px; text-decoration:none; font-family:var(--display); text-transform:uppercase; letter-spacing:.04em;">💻 Ver no GitHub</a>
     </p>
   </div>
 </header>
@@ -156,6 +157,8 @@
     <div class="toc-title">Neste documento</div>
     <ul>
       <li><a href="#visao-geral">Visão geral</a></li>
+      <li><a href="#fluxos">Fluxos do jogo</a></li>
+      <li><a href="#modelo-de-dados">Modelo de dados</a></li>
       <li><a href="#criacao">Criação do clube</a></li>
       <li><a href="#jogadores">Jogadores</a></li>
       <li><a href="#escalacao">Escalação e táticas</a></li>
@@ -167,6 +170,7 @@
       <li><a href="#carreira">Carreira do treinador</a></li>
       <li><a href="#calibracao">Estatísticas e calibração</a></li>
       <li><a href="#interface">Interface</a></li>
+      <li><a href="#guia-de-telas">Guia de telas</a></li>
       <li><a href="#aviso-legal">Aviso legal</a></li>
     </ul>
   </nav>
@@ -204,6 +208,177 @@
         <img src="assets/screenshots/escritorio.jpg" alt="Tela inicial do Escritório mostrando posição na tabela, próximo jogo e botão Jogar Rodada">
         <figcaption>Tela do Escritório — ponto de partida de cada rodada, com o resumo do clube e o próximo confronto.</figcaption>
       </figure>
+    </section>
+
+    <section id="fluxos">
+      <div class="kicker">01.1 — Passo a passo</div>
+      <h2>Fluxos do jogo, na ordem exata em que acontecem</h2>
+      <p class="lead">
+        Esta seção detalha, passo a passo, as sequências internas mais importantes do jogo — a
+        ordem exata das verificações que o motor faz em cada situação, incluindo os casos de borda.
+      </p>
+
+      <div class="panel">
+        <h4>Abertura do jogo (primeira tela)</h4>
+        <ol>
+          <li>O jogo procura uma partida salva no armazenamento local do navegador.</li>
+          <li>Se existir, mostra o botão "📂 Continuar jogo salvo" ao lado do formulário de novo jogo.</li>
+          <li>O formulário de novo jogo tenta buscar (<code>fetch</code>) o dataset opcional do modo
+          Clássico 1998; se a resposta não for bem-sucedida, essa opção de modo simplesmente não é
+          exibida — o Brasileirão 2026 é sempre o modo padrão e nunca depende de nada externo.</li>
+          <li>O jogador preenche nome do técnico e escolhe um clube (ou deixa "Sortear", que
+          escolhe aleatoriamente um clube livre da última divisão — tradição do gênero).</li>
+          <li>É possível adicionar até 6 técnicos humanos no mesmo jogo (hot-seat): cada um assume
+          um clube diferente e joga a sua rodada por vez.</li>
+        </ol>
+      </div>
+
+      <div class="panel">
+        <h4>Criação de um novo jogo (o que acontece ao clicar "Começar carreira")</h4>
+        <ol>
+          <li>O motor gera as 80 equipes das 4 divisões (ver <a href="#criacao">Criação do clube</a>), cada uma com elenco completo, caixa inicial e estádio.</li>
+          <li>Gera um pool de 40 agentes livres (10 por nível de divisão) sem vínculo com nenhum clube.</li>
+          <li>Sorteia o(s) clube(s) dos técnicos humanos (ou usa a escolha manual) e cria um registro de técnico de IA com nome gerado para todos os outros 79 clubes.</li>
+          <li>Constrói o calendário de turno e returno de cada divisão (38 rodadas para 20 clubes) e a chave da Taça com todos os 80 clubes.</li>
+          <li>Intercala liga e Taça: uma fase da Taça é inserida a cada 3 rodadas de liga completadas; as fases restantes da Taça (incluindo a final) só acontecem depois da última rodada de liga.</li>
+          <li>Salva o estado inicial no armazenamento local e leva o jogador à tela de Escritório.</li>
+        </ol>
+      </div>
+
+      <div class="panel">
+        <h4>Ciclo de uma rodada (o coração do loop de jogo)</h4>
+        <ol>
+          <li><b>Fase 1 — Escalação da IA:</b> todo clube não controlado por um humano ativo (incluindo humanos de férias) escala automaticamente pela opção "Automático" (testa as 12 formações e usa a de maior força total).</li>
+          <li><b>Fase 2 — Separação dos confrontos:</b> toda partida da rodada que não envolve nenhum time humano ativo é simulada instantaneamente, do primeiro ao último minuto, sem intervenção. As partidas que envolvem pelo menos um time humano ficam pendentes.</li>
+          <li><b>Fase 3 — Partidas humanas:</b> cada partida pendente é jogada minuto a minuto na tela de partida ao vivo (ver <a href="#motor-de-partida">Motor de partida</a>), com o técnico podendo pausar, mudar velocidade, fazer substituições e escolher cobrador de pênalti.</li>
+          <li><b>Fase 4 — Pós-jogo, para toda partida da rodada:</b> evolução de força dos jogadores que atuaram, atualização de moral, lançamento de bilheteria/salários/juros no caixa, decremento de contrato (com disparo de pedido de renovação ao zerar) e registro nas estatísticas agregadas.</li>
+          <li><b>Fase 5 — Avanço da Taça</b> (só em rodadas de Taça): quando todos os jogos de uma fase terminam, sorteia os confrontos da fase seguinte entre os vencedores (e os isentos da pré-eliminatória); se sobrar só um time, ele é o campeão da Taça e recebe o prêmio na hora.</li>
+          <li><b>Fase 6 — Avança o calendário</b> em uma posição.</li>
+          <li><b>Fase 7 — Vendas forçadas por dívida:</b> todo clube com caixa negativo tenta colocar em leilão (sem lance mínimo) um jogador com contrato perto do fim.</li>
+          <li><b>Fase 8 — Demissões:</b> verifica sequência de derrotas e dívida persistente de todos os técnicos (ver <a href="#carreira">Carreira do treinador</a>).</li>
+          <li><b>Fase 9 — IA resolve pedidos de aumento</b> pendentes dos próprios clubes (aceita se o caixa aguentar 30 jogos do novo salário, ou se for obrigatório).</li>
+          <li><b>Fase 10 — Mercado da IA:</b> cada clube de IA pode, nesta ordem: promover jovens da base se o elenco encolheu, amortizar empréstimo se sobrar caixa, vender o reserva mais fraco se o elenco estiver cheio e o caixa apertado, colocar um reserva aleatório em leilão sem lance mínimo (≈8% de chance por rodada) e contratar um agente livre se precisar de reforço ou tiver caixa sobrando.</li>
+          <li><b>Fase 11 — Notícias:</b> todos os eventos relevantes da rodada (vendas, pedidos de aumento, demissões, promoções da base) entram no mural de notícias, mais recentes primeiro.</li>
+        </ol>
+      </div>
+
+      <div class="panel">
+        <h4>Uma partida ao vivo, minuto a minuto</h4>
+        <ol>
+          <li>Sorteia o árbitro e a ajuda de cada lado, e calcula o público esperado (ver seção 9 do Motor de partida).</li>
+          <li>A cada minuto: testa chance de ataque da casa, testa chance de ataque do visitante, resolve as chances geradas (duelo + chute), testa faltas/cartões/pênaltis dos dois lados, testa lesões dos dois lados.</li>
+          <li>No minuto 45, insere o evento "Fim do primeiro tempo" no feed (sem pausar a simulação).</li>
+          <li>No minuto 90: se for jogo de Taça empatado, roda a disputa por pênaltis antes de encerrar; senão, encerra direto e mostra o placar final.</li>
+          <li>Se surgir um pênalti a favor do time humano, a simulação pausa e espera o técnico escolher o cobrador antes de continuar.</li>
+          <li>Se um titular humano se machucar e houver banco disponível, a simulação pausa e espera o técnico escolher quem entra.</li>
+        </ol>
+      </div>
+
+      <div class="panel">
+        <h4>Um leilão, do anúncio à resolução</h4>
+        <ol>
+          <li>Um jogador é colocado em leilão (pelo próprio clube, por recusa de renovação, ou automaticamente por dívida) com um lance mínimo definido.</li>
+          <li>Durante a rodada em que foi criado, o leilão apenas existe — ainda não recebe lances.</li>
+          <li>Na rodada seguinte, antes das partidas serem resolvidas, cada clube de IA elegível (ver <a href="#mercado">Mercado</a>) calcula se quer ofertar e por quanto; o técnico humano também pode ofertar através da tela de Transferências.</li>
+          <li>Todos os lances válidos (dentro do caixa do ofertante, acima do mínimo) são comparados; o maior vence, com sorteio de moeda em caso de empate exato.</li>
+          <li>Se não houver nenhum lance válido, o jogador sai do leilão e fica temporariamente bloqueado para nova tentativa até a rodada seguinte.</li>
+          <li>A venda, quando acontece, gera uma notícia visível a todos os jogadores humanos — inclusive vendas entre dois clubes de IA.</li>
+        </ol>
+      </div>
+
+      <div class="panel">
+        <h4>Fim de temporada</h4>
+        <ol>
+          <li>Calcula a classificação final de cada divisão e define os campeões.</li>
+          <li>Paga o prêmio de campeão (escalonado por divisão) e registra o título na história do técnico.</li>
+          <li>Define os 4 times que sobem e os 4 que descem em cada fronteira entre divisões.</li>
+          <li>Paga o prêmio de artilheiro a todos os jogadores empatados no topo da artilharia (e aos respectivos clubes).</li>
+          <li>Aplica o envelhecimento e evolução por idade em todo jogador de todo clube (ver <a href="#temporada">Virada de temporada</a>).</li>
+          <li>Clubes com elenco encolhido demais promovem jovens da base para voltar ao mínimo operacional.</li>
+          <li>Reajusta a inflação acumulada em +5% e os salários de todos os jogadores na mesma proporção.</li>
+          <li>Sorteia um calendário totalmente novo (turno/returno de liga + chave de Taça) para a temporada seguinte e zera o contador de rodada.</li>
+        </ol>
+      </div>
+
+      <div class="panel">
+        <h4>Convite e demissão de técnico</h4>
+        <ol>
+          <li>Um técnico é demitido (ver critérios em <a href="#carreira">Carreira do treinador</a>).</li>
+          <li>Se o demitido for humano, o clube passa a ser controlado pela IA imediatamente, com um nome de técnico de IA gerado na hora.</li>
+          <li>Se o demitido for da IA, o motor procura um técnico humano desempregado com o melhor currículo (campeonatos, depois taças, depois pontos de ranking); se todos os humanos já tiverem clube, procura um humano empregado numa divisão inferior à do clube vago.</li>
+          <li>Se encontrar um candidato, oferece um convite que aparece na tela do jogo do técnico convidado — ele pode aceitar (o clube antigo dele passa para a IA) ou recusar.</li>
+          <li>Se não houver candidato humano nenhum, um técnico de IA assume o clube sem gerar convite.</li>
+        </ol>
+      </div>
+
+      <div class="panel">
+        <h4>Salvar e carregar</h4>
+        <ol>
+          <li>O estado inteiro do jogo (todos os 80 clubes, todos os jogadores, calendário, histórico) é salvo automaticamente no armazenamento local do navegador depois de cada ação relevante — não existe botão manual de "salvar".</li>
+          <li>"Continuar jogo salvo" recarrega esse estado exatamente como estava.</li>
+          <li>"Exportar" gera um arquivo JSON com o estado completo, que pode ser guardado fora do navegador.</li>
+          <li>"Importar" lê um desses arquivos JSON e substitui o estado atual — útil para migrar de computador ou manter backups.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="modelo-de-dados">
+      <div class="kicker">01.2 — Estruturas internas</div>
+      <h2>Modelo de dados</h2>
+      <p class="lead">
+        Todo o estado do jogo é um único objeto em memória (e no arquivo salvo), sem banco de
+        dados nem servidor. Estas são as estruturas centrais — úteis para entender exatamente o
+        que o motor guarda sobre cada jogador, clube e técnico.
+      </p>
+
+      <h3>Jogador</h3>
+      <table>
+        <tr><th>Campo</th><th>Tipo</th><th>Significado</th></tr>
+        <tr><td><code>strength</code></td><td>1–50</td><td>força nominal, usada em todos os cálculos do motor</td></tr>
+        <tr><td><code>pos</code></td><td>G / D / M / A</td><td>posição — goleiro, defesa, meio-campo, atacante</td></tr>
+        <tr><td><code>star</code></td><td>booleano</td><td>craque: +25% finalização/pênalti/valor</td></tr>
+        <tr><td><code>behavior</code></td><td>0–5</td><td>de Sarrafeiro (0, mais agressivo) a Fair play (5)</td></tr>
+        <tr><td><code>age</code></td><td>número</td><td>17 a ~35+; afeta valor de mercado e evolução anual</td></tr>
+        <tr><td><code>nationality</code></td><td>código de país</td><td>usado no bônus de força e na regra de estrangeiros</td></tr>
+        <tr><td><code>contractGames</code></td><td>número</td><td>contador regressivo; ao chegar a 0, dispara pedido de renovação</td></tr>
+        <tr><td><code>salary</code></td><td>dinheiro</td><td>pago por jogo disputado pelo clube, não por vitória</td></tr>
+        <tr><td><code>forSale</code> / <code>auction</code></td><td>booleano / objeto ou nulo</td><td>listado para oferta direta / em leilão com lance mínimo</td></tr>
+        <tr><td><code>blockedUntilSeason</code></td><td>número</td><td>comprado ou renovado recentemente: só revende a partir desta temporada</td></tr>
+        <tr><td><code>suspendedGames</code> / <code>injuredGames</code></td><td>número</td><td>jogos restantes de suspensão / lesão — impedem escalação</td></tr>
+        <tr><td><code>history</code></td><td>objeto</td><td>total de jogos, gols, expulsões e lesões na carreira inteira</td></tr>
+      </table>
+
+      <h3>Clube</h3>
+      <table>
+        <tr><th>Campo</th><th>Tipo</th><th>Significado</th></tr>
+        <tr><td><code>division</code></td><td>1–4</td><td>1 = Série A, 4 = Série D</td></tr>
+        <tr><td><code>cash</code></td><td>dinheiro</td><td>caixa atual; pode ficar negativo (dispara venda automática)</td></tr>
+        <tr><td><code>lineup</code></td><td>lista de 11 ids</td><td>titulares atuais</td></tr>
+        <tr><td><code>loan</code></td><td>objeto ou nulo</td><td>capital em dívida com o banco, se houver</td></tr>
+        <tr><td><code>moral</code></td><td>0–20</td><td>clima do elenco, sobe com vitórias e cai com derrotas/dívida</td></tr>
+        <tr><td><code>consecutiveLosses</code></td><td>número</td><td>derrotas seguidas; 5 demite o técnico</td></tr>
+        <tr><td><code>fanCount</code></td><td>número</td><td>tamanho da torcida; contribui para a demanda de bilheteria</td></tr>
+        <tr><td><code>ledger</code></td><td>lista de lançamentos</td><td>histórico contábil completo (só para clubes humanos, para economizar memória)</td></tr>
+      </table>
+
+      <h3>Técnico</h3>
+      <table>
+        <tr><th>Campo</th><th>Tipo</th><th>Significado</th></tr>
+        <tr><td><code>teamId</code></td><td>número ou nulo</td><td>clube atual; nulo = desempregado</td></tr>
+        <tr><td><code>rankingPoints</code></td><td>número</td><td>pontuação acumulada de carreira (ver Carreira do treinador)</td></tr>
+        <tr><td><code>championships</code> / <code>cups</code></td><td>número</td><td>títulos de campeonato (só 1ª divisão) e de Taça</td></tr>
+        <tr><td><code>onVacation</code></td><td>booleano</td><td>de férias: a IA assume decisões, mas o cargo continua do jogador</td></tr>
+        <tr><td><code>history</code></td><td>lista de eventos</td><td>uma linha por marco de carreira (contratações, títulos, demissões)</td></tr>
+      </table>
+
+      <p>
+        O estado global também guarda: o calendário completo da temporada (lista ordenada de
+        rodadas de liga e fases de Taça), as 4 divisões com suas tabelas de rodadas e resultados,
+        a chave da Taça, a lista de técnicos, os leilões em aberto, os pedidos de renovação
+        pendentes, o histórico de transferências (últimas 50), o mural de notícias (últimas 200),
+        o histórico de temporadas anteriores (campeões, artilheiro) e as estatísticas agregadas de
+        partidas realmente jogadas.
+      </p>
     </section>
 
     <section id="criacao">
@@ -382,8 +557,9 @@
         </p>
         <p><code>bônus_nacionalidade</code> = +3 pontos por titular cuja nacionalidade seja igual
         à do clube (incentivo a montar elencos "de casa"). <code>ajuda_árbitro</code> é um valor
-        de 0 a 20 sorteado por árbitro e por lado do jogo (ver seção de árbitros abaixo), com 10
-        sendo neutro.</p>
+        entre 7 e 13 sorteado por árbitro e por lado do jogo de forma independente (ver seção de
+        árbitros abaixo) — 10 é neutro, então o termo <code>(ajuda_árbitro - 10)</code> soma entre
+        -3 e +3 pontos ao setor.</p>
       </div>
       <div class="panel example">
         <div class="label">Sem meio-campo: por que o 5-0-5 funciona</div>
@@ -456,6 +632,49 @@
         <tr><td>😱 No travessão (barra)</td><td>10%</td></tr>
       </table>
 
+      <div class="panel example">
+        <div class="label">Exemplo completo: um minuto de jogo, do início ao fim</div>
+        <p>
+          Flamengo (casa) recebe o Mirassol. Titulares do Flamengo: 4 zagueiros somando força 160
+          (média 40), 4 meias somando 140 (média 35), 2 atacantes somando 90 (média 45), goleiro
+          força 44. Nenhum estrangeiro titular, então bônus de nacionalidade = 3×11 = 33 (time
+          100% brasileiro jogando em casa). Ajuda do árbitro sorteada: 12 para a casa, 9 para o
+          visitante.
+        </p>
+        <div class="kv" style="margin:14px 0">
+          <dt>Ataque do Flamengo</dt><dd>90×2 + 140×2/2 + 33 + (12−10) = 180 + 140 + 33 + 2 = <b>355</b></dd>
+          <dt>Defesa do Mirassol (suponha)</dt><dd>150×2 + 130×2/2 + 40×2 + 20 + (9−10) = 300 + 130 + 80 + 20 − 1 = <b>529</b></dd>
+        </div>
+        <p>
+          Neste minuto, o motor sorteia <code>aleatório(6000)</code> — se o número sair abaixo de
+          355 (chance de ~5,9%), o Flamengo gera uma chance de ataque. Suponha que sai 210: chance
+          gerada. O motor sorteia o finalizador entre os não-goleiros titulares, com peso
+          <code>posição × força</code> (atacante peso 3, meia peso 2, zagueiro peso 1) — um
+          atacante de força 48 tem peso 144, muito acima de um zagueiro de força 40 (peso 40), e
+          por isso tende a ser escolhido; suponha que sai o atacante <b>Pedro★</b> (força 46,
+          craque). Do lado do Mirassol, sorteia-se um defensor com peso invertido (zagueiro peso 3)
+          — sai um zagueiro de força 38.
+        </p>
+        <p>
+          Duelo: <code>aleatório(38) vs aleatório(46)</code>. Suponha que o defensor tira 30 e o
+          atacante tira 40 — o defensor não supera o atacante (30 não é maior que 40), então o
+          desarme falha e o chute acontece. Como Pedro é craque, seu bônus de finalização é
+          <code>46 × 25% = 11,5</code>. Supondo goleiro do Mirassol com força 41:
+        </p>
+        <div class="kv" style="margin:14px 0">
+          <dt>P(gol)</dt><dd><code>0,42 × (46 + 11,5) / (46 + 41)</code> = 0,42 × 57,5 / 87 ≈ <b>27,7%</b></dd>
+        </div>
+        <p>
+          O motor sorteia um número entre 0 e 1; se sair abaixo de 0,277, é <b>GOOOL</b> do
+          Flamengo — evento registrado no minuto, estatística de gol do jogador e do time
+          atualizadas na hora. Se sair acima, sorteia-se o desfecho da chance perdida pela tabela
+          de probabilidades condicionais (40% defesa, 20% para fora, 20% por cima, 10% poste, 10%
+          travessão). Tudo isso acontece, de forma independente, no mesmo minuto para o ataque do
+          visitante — e depois passa para faltas e lesões dos dois lados, antes do relógio avançar
+          para o minuto seguinte.
+        </p>
+      </div>
+
       <h3>5. Faltas, cartões e pênaltis</h3>
       <div class="panel formula">
         <div class="label">Cadeia de sorteios por minuto e por time defensor</div>
@@ -494,10 +713,14 @@
 
       <h3>7. Árbitros</h3>
       <p>
-        Cada partida sorteia um árbitro de um quadro fixo, cada um com um nível de "ajuda" a favor
-        de cada lado (0 a 20, entrando na fórmula de força de ataque/defesa como mostrado acima).
-        Isso simula, de forma simplificada, arbitragens mais ou menos rigorosas ou mais ou menos
-        favoráveis a um dos lados.
+        Cada partida sorteia aleatoriamente um nome de um quadro fixo de mais de 30 árbitros
+        (incluindo nomes conhecidos do futebol nacional e internacional) e, de forma independente,
+        um nível de "ajuda" para cada lado — dois números entre 7 e 13, sorteados separadamente
+        para casa e visitante, entrando na fórmula de força de ataque/defesa da seção 1. Um árbitro
+        pode calhar com ajuda 12 para o mandante e 8 para o visitante na mesma partida (favorecendo
+        a casa em +2 e prejudicando o visitante em -2), ou qualquer outra combinação — não há
+        correlação entre os dois valores. Isso simula, de forma simplificada, arbitragens mais ou
+        menos rigorosas ou mais ou menos favoráveis a um dos lados, sem nunca decidir o jogo sozinho.
       </p>
 
       <h3>8. Disputa por pênaltis</h3>
@@ -547,6 +770,18 @@
           custam um prêmio de 30% sobre o valor "puro"; veteranos (33+) valem metade.
         </p>
       </div>
+      <div class="panel example">
+        <div class="label">Exemplo numérico — valor de mercado</div>
+        <p>
+          Um meia de força 35, comportamento Neutro (fator 1.0), 24 anos, não-craque, sem
+          inflação acumulada (fator 1.0): <code>base = 35² × 4000 × 1.0 = 4.900.000</code>. Fator
+          de idade 22–29 = 1.0, então o valor final é <b>$4.900.000</b>. O mesmo jogador aos 34
+          anos (fator 0.5) valeria só <b>$2.450.000</b> — metade, mesmo com a força intacta. Se
+          fosse craque (+25%) e Cavalheiro (fator de preço 1.1) aos 24 anos:
+          <code>35² × 4000 × 1.1 × 1.25 = 6.737.500</code>, quase 40% a mais que o Neutro
+          equivalente.
+        </p>
+      </div>
       <h3>Oferta direta</h3>
       <p>O jogador humano pode oferecer um valor direto por qualquer jogador de outro clube. O
       vendedor aceita se a oferta superar um piso, que depende de o jogador estar listado à venda
@@ -555,6 +790,21 @@
         <dt>Listado à venda</dt><dd>aceita a partir de 80% do valor de mercado</dd>
         <dt>Titular do time vendedor</dt><dd>exige pelo menos 150% do valor de mercado</dd>
         <dt>Reserva não listado</dt><dd>exige pelo menos 110% do valor de mercado</dd>
+      </div>
+      <div class="panel example">
+        <div class="label">Exemplo — três ofertas pelo mesmo jogador</div>
+        <p>
+          Um zagueiro titular vale $3.000.000 de mercado. O piso de aceitação dele, como titular
+          não listado, é 150% = $4.500.000.
+        </p>
+        <ul class="check">
+          <li>Oferta de <b>$3.500.000</b>: recusada — "pedem mais".</li>
+          <li>Oferta de <b>$4.500.000</b>: aceita no limite exato.</li>
+          <li>Se o mesmo jogador estivesse <b>listado à venda</b> pelo clube (jogador
+          insatisfeito, ou o clube sinalizando que topa negociar), o piso cairia para 80% =
+          $2.400.000 — a mesma oferta de $3.500.000 que antes foi recusada agora seria aceita
+          de imediato.</li>
+        </ul>
       </div>
       <h3>Leilões</h3>
       <p>
@@ -569,6 +819,28 @@
       <p>Quando um jogador é comprado ou tem o contrato renovado, ele fica <b>bloqueado para
       revenda até a próxima temporada</b> — evita comprar e revender o mesmo jogador em sequência
       na mesma janela.</p>
+      <div class="panel example">
+        <div class="label">Exemplo — resolução de um leilão com 3 lances</div>
+        <p>
+          Um atacante é colocado em leilão com lance mínimo de $2.000.000 na rodada 10. Na rodada
+          11, três clubes de IA avaliam a situação: precisam de reforço no ataque e o jogador tem
+          força compatível com o próprio elenco. Cada um sorteia um lance entre o valor de mercado
+          e até 41% acima, limitado a 60% do caixa disponível:
+        </p>
+        <table>
+          <tr><th>Clube</th><th>Caixa</th><th>Lance sorteado</th><th>Válido?</th></tr>
+          <tr><td>Clube A</td><td>$5.000.000</td><td>$3.200.000</td><td>Sim (≤ 60% do caixa)</td></tr>
+          <tr><td>Clube B</td><td>$2.500.000</td><td>$2.100.000</td><td>Sim, mas abaixo do lance de A</td></tr>
+          <tr><td>Clube C</td><td>$1.000.000</td><td>$2.800.000</td><td><b>Não</b> — excede 60% do caixa ($600.000)</td></tr>
+        </table>
+        <p>
+          O técnico humano também pode ofertar pelo mesmo jogador antes da resolução. Se ele
+          ofertar $3.500.000, essa oferta entra na mesma disputa que os lances de IA — vence o
+          maior lance válido de todos, humano ou não; neste caso, o humano leva o jogador por
+          $3.500.000. Se ninguém tivesse ofertado nada, o jogador voltaria ao elenco original e
+          ficaria bloqueado para nova tentativa de leilão até a rodada seguinte.
+        </p>
+      </div>
       <h3>Limites de elenco</h3>
       <div class="kv">
         <dt>Máximo de jogadores</dt><dd>24 por clube</dd>
@@ -602,6 +874,28 @@
         folha salarial, juros de empréstimo e qualquer transferência do dia. Tudo isso alimenta a
         Demonstração de Resultado (DRE) da temporada.
       </p>
+      <div class="panel example">
+        <div class="label">Exemplo — DRE de uma temporada, linha por linha</div>
+        <table>
+          <tr><th>Categoria</th><th>Valor</th></tr>
+          <tr><td>Bilheteria (19 jogos em casa)</td><td>+$27.550.000</td></tr>
+          <tr><td>Premiação (3º lugar na Série A)</td><td>+$0 (só campeão e artilheiro pagam)</td></tr>
+          <tr><td>Venda de jogadores (4 vendas na temporada)</td><td>+$8.200.000</td></tr>
+          <tr><td>Total de receitas</td><td><b>$35.750.000</b></td></tr>
+          <tr><td>Salários (38 jogos × folha média $630.000)</td><td>−$23.940.000</td></tr>
+          <tr><td>Compra de jogadores (2 compras)</td><td>−$5.100.000</td></tr>
+          <tr><td>Juros do empréstimo (5%/jogo sobre $2.000.000 em dívida, ~10 jogos com saldo)</td><td>−$1.000.000</td></tr>
+          <tr><td>Obras no estádio (1 ampliação)</td><td>−$530.000</td></tr>
+          <tr><td>Total de despesas</td><td><b>−$30.570.000</b></td></tr>
+          <tr><td><b>Resultado da temporada</b></td><td><b>+$5.180.000</b></td></tr>
+        </table>
+        <p>
+          Note que juros de empréstimo são cobrados <b>por jogo</b>, não por temporada — um clube
+          que pega $1.000.000 emprestado e demora 20 jogos para quitar paga 20 parcelas de 5% do
+          saldo devedor <em>daquele momento</em> (o saldo cai a cada amortização), não 5% fixo uma
+          vez só.
+        </p>
+      </div>
       <h3>Empréstimo bancário</h3>
       <div class="panel formula">
         <div class="label">Regras</div>
@@ -643,10 +937,47 @@
         <img src="assets/screenshots/classificacao.jpg" alt="Tabela de classificação da Série A com pontos, jogos, vitórias, empates, derrotas e saldo de gols">
         <figcaption>Classificação da Série A — critérios de desempate: pontos, saldo de gols, gols pró.</figcaption>
       </figure>
+      <div class="panel example">
+        <div class="label">Exemplo — acesso e queda entre Série B e Série C</div>
+        <p>Ao fim da temporada, a Série B termina assim (posições 1ª a 4ª sobem, 17ª a 20ª descem):</p>
+        <table>
+          <tr><th>Posição</th><th>Clube</th><th>Pontos</th><th>Movimento</th></tr>
+          <tr><td>1ª</td><td>Cruzeiro</td><td>82</td><td>↑ Sobe para a Série A</td></tr>
+          <tr><td>2ª–4ª</td><td>(3 outros clubes)</td><td>71–76</td><td>↑ Sobem para a Série A</td></tr>
+          <tr><td>5ª–16ª</td><td>(12 clubes)</td><td>38–68</td><td>Permanecem na Série B</td></tr>
+          <tr><td>17ª–20ª</td><td>(4 piores clubes)</td><td>22–29</td><td>↓ Descem para a Série C</td></tr>
+        </table>
+        <p>
+          Ao mesmo tempo, a Série C também processa a própria tabela: seus 4 primeiros sobem para
+          ocupar exatamente as 4 vagas abertas pela Série B, e seus 4 últimos descem para a Série
+          D — o mesmo movimento acontece simultaneamente em todas as fronteiras entre divisões, e
+          só depois disso o motor monta as novas tabelas de 20 times por divisão para a temporada
+          seguinte.
+        </p>
+      </div>
       <figure>
         <img src="assets/screenshots/jogos-rodada.jpg" alt="Lista de jogos da 1ª rodada da Série A com placares e público de cada partida">
         <figcaption>Resultados de uma rodada completa da Série A, incluindo o público pagante de cada jogo.</figcaption>
       </figure>
+      <div class="panel example">
+        <div class="label">Exemplo — como liga e Taça se intercalam no calendário</div>
+        <p>
+          Com 80 clubes na temporada, a liga tem 38 rodadas e a Taça precisa de 7 estágios
+          (pré-eliminatória + 6 fases até a final, já que 80 não é potência de 2). O calendário
+          fica assim:
+        </p>
+        <div class="kv">
+          <dt>Rodadas 1–3 (liga)</dt><dd>3 jornadas de campeonato seguidas</dd>
+          <dt>Entrada 4</dt><dd>Pré-eliminatória da Taça</dd>
+          <dt>Rodadas 5–7 (liga)</dt><dd>mais 3 jornadas de campeonato</dd>
+          <dt>Entrada 8</dt><dd>Oitavos de final da Taça</dd>
+          <dt>… padrão se repete …</dt><dd>a cada 3 jornadas de liga, entra 1 fase da Taça</dd>
+          <dt>Após a rodada 38 (fim da liga)</dt><dd>todos os estágios restantes da Taça, incluindo a final, acontecem em sequência</dd>
+        </div>
+        <p>Ao todo, a temporada tem 38 + 7 = <b>45 entradas no calendário</b> — exatamente o
+        "Jornada X/45" mostrado no rodapé do jogo.</p>
+      </div>
+
       <h3>Taça</h3>
       <p>
         Torneio eliminatório de jogo único envolvendo <b>todas as equipes das quatro divisões ao
@@ -757,6 +1088,18 @@
         <img src="assets/screenshots/calibracao.jpg" alt="Painel de calibração do motor de partida com sliders para cada parâmetro">
         <figcaption>Painel de Calibração — cada slider ajusta uma das constantes do motor em tempo real, valendo a partir da próxima partida simulada.</figcaption>
       </figure>
+      <div class="panel example">
+        <div class="label">Exemplo — efeito de subir a "Conversão de gol"</div>
+        <p>
+          Retomando o exemplo da seção "Motor de partida": com o fator padrão 0,42, a chance de
+          gol daquele chute específico era ≈27,7%. Se o jogador aumentar a Conversão de gol para
+          0,55 no painel de Calibração (um jogo mais "gordo" em placar), a mesma situação exata
+          passa a ter <code>0,55 × 57,5 / 87 ≈ 36,3%</code> de chance de gol — um salto de quase 9
+          pontos percentuais na mesma jogada, sem mexer em mais nada. O efeito só vale a partir da
+          próxima partida simulada; jogos já em andamento continuam com a calibração que estava
+          ativa quando começaram.
+        </p>
+      </div>
       <p>
         Para validar o efeito dessas mudanças na prática, o jogo mantém um <b>painel de
         estatísticas agregadas</b> de toda a carreira: gols por jogo, % de vitórias em
@@ -784,6 +1127,106 @@
         <li><b>Confirmações antes de ações irreversíveis</b> (rescisões, leilões, empréstimos) para
         evitar cliques acidentais que custem caro.</li>
       </ul>
+    </section>
+
+    <section id="guia-de-telas">
+      <div class="kicker">13 — Referência</div>
+      <h2>Guia de telas</h2>
+      <p class="lead">
+        Referência rápida de cada tela do jogo: o que cada elemento mostra e faz. As capturas de
+        tela correspondentes já aparecem nas seções acima — os links abaixo levam direto a elas.
+      </p>
+
+      <h3>Escritório <a href="#visao-geral" style="font-size:.7em">(ver captura)</a></h3>
+      <p>Tela de partida — é onde toda rodada começa e termina.</p>
+      <table>
+        <tr><th>Elemento</th><th>O que mostra/faz</th></tr>
+        <tr><td>Painel do clube</td><td>nome, divisão, técnico, posição atual na tabela, caixa e moral do elenco</td></tr>
+        <tr><td>Painel do próximo confronto</td><td>adversário, mando de campo, força média do adversário, moral dele e quantos titulares seus estão aptos a jogar</td></tr>
+        <tr><td>Botão "🏁 Jogar rodada" (atalho J)</td><td>inicia a fase de simulação da rodada corrente (liga ou Taça)</td></tr>
+        <tr><td>Mural de notícias</td><td>eventos recentes: vendas, pedidos de aumento, demissões, promoções da base</td></tr>
+        <tr><td>Barra de status (rodapé)</td><td>clube ativo, caixa, posição, moral, número da rodada e dicas de atalho</td></tr>
+      </table>
+
+      <h3>Elenco <a href="#escalacao" style="font-size:.7em">(ver captura)</a></h3>
+      <p>Escalação, formação e gestão individual de cada jogador do plantel.</p>
+      <table>
+        <tr><th>Elemento</th><th>O que mostra/faz</th></tr>
+        <tr><td>Diagrama de campo</td><td>os 11 titulares posicionados pela formação atual, com força e bandeira de nacionalidade quando estrangeiro</td></tr>
+        <tr><td>🤖 Automático / ⭐ Melhores</td><td>escalação automática por força total ou pela formação atual (ver <a href="#escalacao">Escalação e táticas</a>)</td></tr>
+        <tr><td>12 botões de formação + 5-0-5</td><td>força a escalação para o esquema tático escolhido, com os mais fortes disponíveis em cada posição</td></tr>
+        <tr><td>Checkbox "Tit."</td><td>inclui/remove o jogador dos 11 titulares manualmente (bloqueado para suspensos/lesionados)</td></tr>
+        <tr><td>Colunas da tabela</td><td>posição, força, idade, país, comportamento, jogos restantes de contrato, salário, valor de mercado, gols na temporada e situação (suspenso/lesionado/em leilão/à venda/bloqueado)</td></tr>
+        <tr><td>Ações por linha</td><td>Renovar contrato, Leiloar/Tirar do leilão, Listar/Tirar da lista (venda direta), Rescindir contrato</td></tr>
+      </table>
+
+      <h3>Transferências → Observar clubes <a href="#mercado" style="font-size:.7em">(ver captura)</a></h3>
+      <p>Permite inspecionar o elenco completo de qualquer clube rival e negociar diretamente.</p>
+      <table>
+        <tr><th>Elemento</th><th>O que mostra/faz</th></tr>
+        <tr><td>Seletor de clube</td><td>escolhe qualquer um dos 79 clubes controlados pela IA (ou por outro humano em hot-seat)</td></tr>
+        <tr><td>Tabela de elenco do rival</td><td>mesmas colunas da tela de Elenco: força, idade, país, comportamento, valor</td></tr>
+        <tr><td>Botão "Fazer oferta"</td><td>abre o campo de valor para uma oferta direta por aquele jogador especificamente</td></tr>
+      </table>
+      <p>As outras abas de Transferências são: <b>Mercado</b> (jogadores listados à venda por
+      qualquer clube), <b>Agentes livres</b> (contratação sem custo de transferência, só luvas),
+      <b>Observados</b> (lista de até 15 jogadores marcados com anotação pessoal para acompanhar) e
+      <b>Histórico</b> (últimas 50 transferências realizadas na liga inteira).</p>
+
+      <h3>Finanças → DRE da temporada <a href="#financas" style="font-size:.7em">(ver captura)</a></h3>
+      <table>
+        <tr><th>Elemento</th><th>O que mostra/faz</th></tr>
+        <tr><td>Receitas operacionais</td><td>bilheteria e premiações recebidas na temporada corrente</td></tr>
+        <tr><td>Despesas operacionais</td><td>salários, compras de jogadores, juros, obras — tudo negativo</td></tr>
+        <tr><td>Resultado operacional</td><td>soma de receitas menos despesas</td></tr>
+      </table>
+      <p>As outras abas de Finanças são: <b>Resumo e ações</b> (pedir empréstimo, amortizar,
+      ampliar estádio, ajustar preço do ingresso), <b>Orçamento</b> (projeção de caixa até o fim da
+      temporada, considerando jogos em casa restantes e folha salarial) e <b>Extrato</b>
+      (lançamento contábil individual de cada evento, mais recente primeiro).</p>
+
+      <h3>Campeonato → Classificação e Jogos <a href="#competicoes" style="font-size:.7em">(ver captura)</a></h3>
+      <table>
+        <tr><th>Elemento</th><th>O que mostra/faz</th></tr>
+        <tr><td>Abas Série A–D</td><td>alterna a tabela entre as 4 divisões</td></tr>
+        <tr><td>Colunas da tabela</td><td>posição, clube, pontos, jogos, vitórias, empates, derrotas, gols pró, gols contra, saldo</td></tr>
+        <tr><td>Linha do clube do jogador</td><td>destacada em verde para localização rápida</td></tr>
+        <tr><td>Aba "Jogos"</td><td>todos os confrontos de uma rodada específica, com placar e público pagante; setas navegam entre rodadas</td></tr>
+        <tr><td>Aba "Calendário"</td><td>visão completa de todas as 45 entradas da temporada, liga e Taça intercaladas</td></tr>
+      </table>
+
+      <h3>Campeonato → Taça <a href="#competicoes" style="font-size:.7em">(ver captura)</a></h3>
+      <p>Mostra o chaveamento do estágio atual da Taça — confrontos ainda não realizados aparecem
+      com "x" no lugar do placar. Cada card de confronto mostra os dois clubes com o escudo/cor da
+      divisão de origem, permitindo ver de relance o quanto o chaveamento mistura divisões
+      diferentes.</p>
+
+      <h3>Histórico → Ranking de treinadores <a href="#carreira" style="font-size:.7em">(ver captura)</a></h3>
+      <table>
+        <tr><th>Elemento</th><th>O que mostra/faz</th></tr>
+        <tr><td>Colunas</td><td>nome do técnico, clube atual, campeonatos, taças, pontos de ranking</td></tr>
+        <tr><td>Ordenação</td><td>campeonatos → taças → pontos, nessa prioridade</td></tr>
+        <tr><td>Linha do jogador</td><td>destacada, com ícone de troféu ao lado do nome</td></tr>
+      </table>
+      <p>As outras abas de Histórico são: <b>Temporadas</b> (campeões e artilheiro de cada
+      temporada concluída), <b>História do treinador</b> (linha do tempo de marcos de carreira do
+      técnico ativo) e <b>Perfil do treinador</b> (liga/desliga gestão automática de salários e
+      escolhe a política de participação em leilões: sempre, só se for forte, ou nunca).</p>
+
+      <h3>Histórico → Estatísticas <a href="#calibracao" style="font-size:.7em">(ver captura)</a></h3>
+      <table>
+        <tr><th>Elemento</th><th>O que mostra/faz</th></tr>
+        <tr><td>Gols por jogo / do mandante / do visitante</td><td>média acumulada desde o início da contagem</td></tr>
+        <tr><td>% de vitórias mandante/visitante/empate</td><td>distribuição de resultados de todas as partidas contabilizadas</td></tr>
+        <tr><td>Cartões, pênaltis e lesões por jogo</td><td>médias que refletem diretamente os parâmetros do painel de Calibração</td></tr>
+        <tr><td>Botão "Zerar estatísticas"</td><td>reinicia a contagem a partir da rodada atual — útil logo após mudar a Calibração, para medir só o efeito novo</td></tr>
+      </table>
+
+      <h3>Configurações → Calibração do motor <a href="#calibracao" style="font-size:.7em">(ver captura)</a></h3>
+      <p>Um slider por parâmetro, com valor numérico ao lado e uma dica de uma linha explicando o
+      efeito de subir ou descer aquele valor específico. As outras seções de Configurações
+      cobrem: tema visual, velocidade padrão de partida, som, confirmações de ações irreversíveis e
+      referência de atalhos de teclado.</p>
     </section>
 
   </main>

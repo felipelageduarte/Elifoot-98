@@ -16,7 +16,7 @@ export interface Settings {
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-  theme: 'retro',
+  theme: 'ultra',
   matchSpeed: 'normal',
   sound: true,
   confirmations: true,

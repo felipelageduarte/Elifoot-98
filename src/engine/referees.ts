@@ -1,6 +1,6 @@
 import { pick, randInt } from './rng'
 
-// Árbitros (amostra do REFEREE.TXE original + brasileiros, Apêndice B)
+// Quadro de árbitros sorteados a cada partida
 export const REFEREES = [
   'Olegário Benquerença', 'Vítor Pereira', 'Lucílio Baptista', 'Pedro Proença',
   'Jorge Sousa', 'Duarte Gomes', 'Carlos Xistra', 'João Ferreira',
