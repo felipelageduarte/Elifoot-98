@@ -23,6 +23,13 @@ html, body, #root {
   height: 100%;
 }
 
+html, body {
+  /* trava de segurança: nenhum elemento (mesmo com bug de largura) deve
+     forçar scroll/zoom horizontal da página no celular */
+  overflow-x: hidden;
+  width: 100%;
+}
+
 body {
   background: var(--desktop);
   font-family: 'Tahoma', 'MS Sans Serif', 'Segoe UI', sans-serif;
@@ -1555,6 +1562,39 @@ body.theme-modern .team-link:hover {
 }
 
 /* ==================================================================
+   Navegação mobile: barra compacta (tela atual + botão ☰) que abre uma
+   gaveta em tela cheia com grade de telas — em vez de tentar encolher
+   a barra de menu do desktop até caber. Escondida por padrão; a media
+   query de mobile abaixo é quem liga (display:flex).
+   ================================================================== */
+
+.mobile-topbar {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 2px solid;
+  border-color: var(--win-dark);
+  background: var(--win-bg);
+}
+
+.mobile-nav-toggle {
+  font-size: 18px;
+  line-height: 1;
+  padding: 6px 12px;
+  min-height: 40px;
+}
+
+.mobile-topbar-title {
+  flex: 1;
+  font-weight: bold;
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ==================================================================
    Mobile: telas estreitas (celular). Reduz densidade retrô,
    aumenta alvos de toque e evita títulos/gráficos gigantes.
    ================================================================== */
@@ -1696,32 +1736,123 @@ body.theme-modern .team-link:hover {
     text-align: center;
   }
 
-  /* Barra de menu principal: alvos de toque full-width, um por linha,
-     em vez de botões pequenos quebrando em várias linhas desalinhadas. */
+  /* Barra de menu de desktop (linha de botões + dropdowns) não cabe de
+     forma usável no celular — substituída pela barra compacta + gaveta
+     definidas abaixo. */
   .menubar {
-    flex-direction: column;
-    align-items: stretch;
+    display: none;
   }
 
-  .menubar button,
-  .menu-dropdown {
-    width: 100%;
+  .mobile-topbar {
+    display: flex;
   }
+}
 
-  .menu-dropdown button {
-    width: 100%;
-    text-align: left;
-  }
+.mobile-team-select {
+  max-width: 40%;
+}
 
-  .menubar .menu-dropdown-panel {
-    position: static;
-    width: 100%;
-    margin-top: 2px;
-    box-shadow: none;
-  }
+.mobile-nav-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+}
 
-  .menubar select {
-    width: 100%;
-    margin-top: 2px;
-  }
+.mobile-nav-drawer {
+  width: 100%;
+  max-height: 82vh;
+  overflow-y: auto;
+  background: var(--win-bg);
+  border-top: 2px solid;
+  border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+  border-radius: 14px 14px 0 0;
+  padding: 6px 10px 18px;
+  animation: mnav-up 0.18s ease-out;
+}
+
+@keyframes mnav-up {
+  from { transform: translateY(16px); opacity: 0.4; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.mobile-nav-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 4px 10px;
+}
+
+.mobile-nav-header b {
+  font-size: 15px;
+}
+
+.mobile-nav-close {
+  min-height: 36px;
+  min-width: 36px;
+  font-size: 15px;
+  padding: 2px 10px;
+}
+
+.mobile-nav-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.mobile-nav-item {
+  min-height: 52px;
+  padding: 8px 10px;
+  font-size: 14px;
+  text-align: left;
+}
+
+.mobile-nav-item.active {
+  border-color: var(--win-darker) var(--win-light) var(--win-light) var(--win-darker);
+  background: #d4d0c8;
+  font-weight: bold;
+}
+
+.mobile-nav-item.wide {
+  grid-column: 1 / -1;
+  text-align: center;
+}
+
+.mobile-nav-sep {
+  height: 1px;
+  margin: 10px 2px;
+  background: var(--win-dark);
+}
+
+body.theme-modern .mobile-topbar,
+body.theme-modern .mobile-nav-drawer {
+  background: #ffffff;
+  border-color: #d7e2d9;
+}
+
+body.theme-modern .mobile-nav-item.active {
+  background: #0b6e2e;
+  color: white;
+}
+
+body.theme-ultra .mobile-topbar {
+  background: linear-gradient(180deg, rgba(16, 32, 22, 0.98), rgba(9, 18, 13, 0.99));
+  border-color: var(--u-chalk-strong);
+}
+
+body.theme-ultra .mobile-nav-drawer {
+  background: linear-gradient(180deg, rgba(16, 32, 22, 0.99), rgba(6, 13, 9, 0.99));
+  border-color: var(--u-chalk-strong);
+}
+
+body.theme-ultra .mobile-topbar-title {
+  font-family: var(--u-display);
+}
+
+body.theme-ultra .mobile-nav-item.active {
+  background: var(--u-grass-soft);
+  color: var(--u-ink);
+  box-shadow: inset 3px 0 0 var(--u-grass);
 }

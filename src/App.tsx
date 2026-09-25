@@ -88,6 +88,7 @@ export default function App() {
   const [flow, setFlow] = useState<RoundFlow | null>(null)
   const [invites, setInvites] = useState<{ managerName: string; teamId: number }[]>([])
   const [summary, setSummary] = useState<SeasonSummary | null>(null)
+  const [navOpen, setNavOpen] = useState(false)
   const [, setTick] = useState(0)
   const confirm = useConfirm(settings)
 
@@ -318,6 +319,10 @@ export default function App() {
       const tag = (e.target as HTMLElement)?.tagName
       if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return
       if (auctionPhase || raiseQueue.length > 0 || summary || invites.length > 0) return
+      if (navOpen) {
+        if (e.key === 'Escape') setNavOpen(false)
+        return
+      }
       if (flow && !flow.report) return
       if (flow?.report) {
         if (e.key === 'Enter') setFlow(null)
@@ -329,7 +334,7 @@ export default function App() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [state, flow, auctionPhase, raiseQueue, summary, invites, handlePlayRound])
+  }, [state, flow, auctionPhase, raiseQueue, summary, invites, navOpen, handlePlayRound])
 
   if (!state) {
     return (
@@ -565,6 +570,86 @@ export default function App() {
               </select>
             )}
           </div>
+
+          <div className="mobile-topbar">
+            <button className="mobile-nav-toggle" aria-label="Abrir menu" onClick={() => setNavOpen(true)}>
+              ☰
+            </button>
+            <span className="mobile-topbar-title">{SCREEN_LABEL[screen]}</span>
+            {state.humanTeamIds.length > 1 && (
+              <select
+                className="mobile-team-select"
+                value={activeTeamId}
+                onChange={(e) => setActiveTeamId(Number(e.target.value))}
+              >
+                {state.humanTeamIds.map((id) => (
+                  <option key={id} value={id}>
+                    {state.teams[id].name}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+
+          {navOpen && (
+            <div className="mobile-nav-backdrop" onClick={() => setNavOpen(false)}>
+              <div className="mobile-nav-drawer" onClick={(e) => e.stopPropagation()}>
+                <div className="mobile-nav-header">
+                  <b>Menu</b>
+                  <button className="mobile-nav-close" onClick={() => setNavOpen(false)}>
+                    ✕
+                  </button>
+                </div>
+                <div className="mobile-nav-grid">
+                  {[...TOP_LEVEL_SCREENS, ...CAMPEONATO_SCREENS].map((scr) => (
+                    <button
+                      key={scr}
+                      className={`mobile-nav-item${screen === scr ? ' active' : ''}`}
+                      onClick={() => { setScreen(scr); setNavOpen(false) }}
+                    >
+                      {SCREEN_LABEL[scr]}
+                    </button>
+                  ))}
+                </div>
+                <div className="mobile-nav-sep" />
+                <div className="mobile-nav-grid">
+                  {SISTEMA_SCREENS.map((scr) => (
+                    <button
+                      key={scr}
+                      className={`mobile-nav-item${screen === scr ? ' active' : ''}`}
+                      onClick={() => { setScreen(scr); setNavOpen(false) }}
+                    >
+                      {SCREEN_LABEL[scr]}
+                    </button>
+                  ))}
+                  <button
+                    className="mobile-nav-item wide"
+                    onClick={() => {
+                      navigator.clipboard?.writeText(exportSave(state))
+                      alert('Save copiado para a área de transferência!')
+                      setNavOpen(false)
+                    }}
+                  >
+                    📤 Exportar save
+                  </button>
+                  <button
+                    className="mobile-nav-item wide"
+                    onClick={() => {
+                      setNavOpen(false)
+                      confirm.ask({
+                        title: 'Sair para o menu',
+                        message: 'Sair para o menu? O jogo fica salvo automaticamente.',
+                        confirmLabel: 'Sair',
+                        action: () => setState(null),
+                      })
+                    }}
+                  >
+                    🚪 Sair para o menu
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="window-body" key={screen}>
             {screen === 'office' && <Office state={state} team={team} onPlayRound={handlePlayRound} seasonOver={seasonOver} />}
